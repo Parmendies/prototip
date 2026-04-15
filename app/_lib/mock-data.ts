@@ -282,6 +282,7 @@ export const mockDashboardStats = {
     { name: 'Diğer',       count: 28, percentage: 10 },
   ],
   socialMediaLeads: {
+    telegram: 12,
     instagram: 23,
     total: 38,
     conversionRate: 71,

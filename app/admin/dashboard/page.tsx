@@ -150,12 +150,12 @@ export default function AdminDashboardPage() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-[var(--color-text-muted)]">Telegram</span>
-                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{socialMediaLeads.facebook}</span>
+                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{socialMediaLeads.telegram}</span>
               </div>
               <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-[#1877f2] to-[#0866ff] transition-all"
-                  style={{ width: `${(socialMediaLeads.facebook / socialMediaLeads.total) * 100}%` }}
+                  style={{ width: `${(socialMediaLeads.telegram / socialMediaLeads.total) * 100}%` }}
                 />
               </div>
               <div className="pt-2 divider">
