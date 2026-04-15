@@ -136,9 +136,9 @@ export default function HospitalSetupPage() {
             {step === 2 && (
               <Card className="animate-slide-up space-y-5">
                 <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">İletişim Bilgileri</h2>
-                <Input id="hospital-phone" label="Telefon" placeholder="+90 212 000 0000" prefix={<Phone size={14} />} defaultValue="+90 212 555 0100" />
-                <Input id="hospital-email" label="E-posta" type="email" placeholder="info@hastane.com" prefix={<Mail size={14} />} defaultValue="info@medikum.com.tr" />
-                <Input id="hospital-website" label="Web Sitesi" placeholder="www.hastane.com" prefix={<Globe size={14} />} defaultValue="www.medikum.com.tr" />
+                <Input id="hospital-phone" label="Telefon" placeholder="+90 212 000 0000" leftIcon={<Phone size={14} />} defaultValue="+90 212 555 0100" />
+                <Input id="hospital-email" label="E-posta" type="email" placeholder="info@hastane.com" leftIcon={<Mail size={14} />} defaultValue="info@medikum.com.tr" />
+                <Input id="hospital-website" label="Web Sitesi" placeholder="www.hastane.com" leftIcon={<Globe size={14} />} defaultValue="www.medikum.com.tr" />
 
                 <div className="pt-2 divider" />
 
