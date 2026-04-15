@@ -1,65 +1,168 @@
-import Image from "next/image";
+import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: 'MediPanel — Akıllı Hastane Yönetim Sistemi',
+  description: 'Hastane yöneticisi, doktor veya hasta olarak sisteme giriş yapın.',
+};
+
+const roles = [
+  {
+    id: 'admin',
+    href: '/admin/dashboard',
+    emoji: '🏥',
+    label: 'Hastane Yönetimi',
+    description: 'Departman, personel ve tüm operasyonları yönetin',
+    gradient: 'from-[hsl(172,66%,40%)] to-[hsl(172,66%,28%)]',
+    glow: 'hsl(172,66%,50%,0.25)',
+    badge: 'Admin Paneli',
+    badgeColor: 'bg-[var(--color-primary-muted)] text-[var(--color-primary)]',
+    features: ['Dashboard & İstatistikler', 'Personel Yönetimi', 'Departman & Oda Düzenleme'],
+  },
+  {
+    id: 'doctor',
+    href: '/doctor/calendar',
+    emoji: '👨‍⚕️',
+    label: 'Doktor Paneli',
+    description: 'Takviminizi, hastalarınızı ve randevularınızı yönetin',
+    gradient: 'from-[hsl(258,60%,55%)] to-[hsl(258,60%,40%)]',
+    glow: 'hsl(258,60%,60%,0.25)',
+    badge: 'Doktor Paneli',
+    badgeColor: 'bg-[var(--color-secondary-muted)] text-[var(--color-secondary)]',
+    features: ['Günlük & Haftalık Takvim', 'Hasta Dosyaları', 'Online Görüşme'],
+  },
+  {
+    id: 'patient',
+    href: '/patient/book',
+    emoji: '🧑‍🤝‍🧑',
+    label: 'Hasta Portalı',
+    description: 'Randevu alın, belgelerinizi yükleyin, takibinizi yapın',
+    gradient: 'from-[hsl(38,92%,50%)] to-[hsl(38,92%,38%)]',
+    glow: 'hsl(38,92%,55%,0.25)',
+    badge: 'Hasta Portalı',
+    badgeColor: 'bg-[var(--color-accent-muted)] text-[var(--color-accent)]',
+    features: ['Randevu Al', 'Randevularım', 'Aile Üyeleri'],
+  },
+];
+
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="min-h-screen flex flex-col">
+      {/* Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div
+          className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle, hsl(172,66%,50%) 0%, transparent 70%)' }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <div
+          className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-8"
+          style={{ background: 'radial-gradient(circle, hsl(258,60%,60%) 0%, transparent 70%)' }}
+        />
+        {/* Grid overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'linear-gradient(var(--color-text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--color-text-primary) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+      </div>
+
+      {/* Header */}
+      <header className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-lg shadow-[var(--shadow-glow-primary)]">
+            +
+          </div>
+          <span className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">
+            Medi<span className="text-[var(--color-primary)]">Panel</span>
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2.5 py-1 rounded-full bg-[var(--color-success-muted)] text-[var(--color-success)] font-medium">
+            ● Sistem Aktif
+          </span>
         </div>
-      </main>
-    </div>
+      </header>
+
+      {/* Hero */}
+      <section className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center max-w-5xl mx-auto w-full animate-slide-up">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color-primary-muted)] border border-[var(--color-primary)]/20 mb-6 text-sm text-[var(--color-primary)] font-medium">
+          <span>✦</span>
+          <span>Multi-Tenant Akıllı Sağlık Platformu</span>
+        </div>
+
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text-primary)] leading-tight mb-4">
+          Hastane Yönetimini
+          <br />
+          <span className="gradient-text">Bir Üst Seviyeye</span> Taşıyın
+        </h1>
+
+        <p className="text-[var(--color-text-secondary)] text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+          Doktor takvimleri, hasta randevuları ve hastane operasyonlarını tek bir akıllı platformda yönetin.
+          AI destekli randevu sistemi ve sosyal medya entegrasyonu ile fark yaratın.
+        </p>
+
+        {/* Role cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+          {roles.map((role) => (
+            <Link
+              key={role.id}
+              href={role.href}
+              id={`role-card-${role.id}`}
+              className="group relative rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-6 text-left transition-all duration-300 hover:border-[var(--color-border)] hover:-translate-y-1"
+              style={{
+                ['--glow' as string]: role.glow,
+              }}
+            >
+              {/* Hover glow */}
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: `radial-gradient(ellipse at center, ${role.glow} 0%, transparent 70%)` }}
+              />
+
+              <div className="relative">
+                {/* Badge */}
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mb-4 ${role.badgeColor}`}>
+                  {role.badge}
+                </span>
+
+                {/* Emoji */}
+                <div className="text-4xl mb-3">{role.emoji}</div>
+
+                {/* Title */}
+                <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-1.5">
+                  {role.label}
+                </h2>
+                <p className="text-sm text-[var(--color-text-muted)] mb-4 leading-relaxed">
+                  {role.description}
+                </p>
+
+                {/* Features */}
+                <ul className="space-y-1.5 mb-5">
+                  {role.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+                      <span className="text-[var(--color-primary)] shrink-0">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <div className="flex items-center gap-2 text-sm font-medium text-[var(--color-primary)] group-hover:gap-3 transition-all duration-200">
+                  <span>Giriş Yap</span>
+                  <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-6 text-center text-xs text-[var(--color-text-muted)]">
+        MediPanel v1.0 — MVP Prototipi &copy; 2026
+      </footer>
+    </main>
   );
 }

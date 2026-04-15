@@ -1,26 +1,238 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* =====================================================
+   HASTANE PANELİ — DESIGN SYSTEM
+   Light-first, soft glassmorphism, teal primary
+   ===================================================== */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* --- Typography --- */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* --- Color Tokens (Light/Soft) --- */
+  --color-bg-base:       hsl(210 20% 98%);
+  --color-bg-surface:    hsl(0 0% 100%);
+  --color-bg-elevated:   hsl(210 20% 96%);
+  --color-bg-overlay:    hsl(210 20% 94%);
+
+  --color-border:        hsl(210 20% 90%);
+  --color-border-subtle: hsl(210 20% 94%);
+
+  --color-primary:       hsl(172 50% 45%);
+  --color-primary-light: hsl(172 60% 60%);
+  --color-primary-dark:  hsl(172 50% 35%);
+  --color-primary-muted: hsl(172 40% 92%);
+
+  --color-secondary:     hsl(258 50% 60%);
+  --color-secondary-muted: hsl(258 40% 94%);
+
+  --color-accent:        hsl(38 90% 50%);
+  --color-accent-muted:  hsl(38 70% 94%);
+
+  --color-success:       hsl(142 60% 40%);
+  --color-success-muted: hsl(142 50% 92%);
+
+  --color-warning:       hsl(38 92% 50%);
+  --color-warning-muted: hsl(38 70% 92%);
+
+  --color-error:         hsl(0 75% 55%);
+  --color-error-muted:   hsl(0 60% 94%);
+
+  --color-text-primary:   hsl(222 47% 15%);
+  --color-text-secondary: hsl(215 25% 40%);
+  --color-text-muted:     hsl(215 20% 60%);
+
+  /* --- Soft Shadows --- */
+  --shadow-sm:  0 1px 2px hsl(222 47% 4% / 0.04);
+  --shadow-md:  0 4px 12px hsl(222 47% 4% / 0.06);
+  --shadow-lg:  0 8px 30px hsl(222 47% 4% / 0.08);
+  --shadow-glow-primary: 0 0 20px hsl(172 66% 50% / 0.15);
+  --shadow-glow-secondary: 0 0 20px hsl(258 60% 60% / 0.15);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =====================================================
+   BASE STYLES
+   ===================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  min-height: 100vh;
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px hsl(172 66% 50% / 0.3); }
+  50%       { box-shadow: 0 0 20px hsl(172 66% 50% / 0.6); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =====================================================
+   UTILITY CLASSES
+   ===================================================== */
+
+/* Glass effects */
+.glass {
+  background: hsl(0 0% 100% / 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(210 20% 90% / 0.8);
+}
+
+.glass-subtle {
+  background: hsl(210 20% 98% / 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid hsl(210 20% 94% / 0.5);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+}
+
+.gradient-surface {
+  background: linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-base) 100%);
+}
+
+/* Glow */
+.glow-primary {
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.glow-secondary {
+  box-shadow: var(--shadow-glow-secondary);
+}
+
+/* Animations */
+.animate-fade-in      { animation: fadeIn 0.3s ease-out forwards; }
+.animate-slide-up     { animation: slideUp 0.4s ease-out forwards; }
+.animate-slide-left   { animation: slideInLeft 0.3s ease-out forwards; }
+.animate-scale-in     { animation: scaleIn 0.25s ease-out forwards; }
+.animate-pulse-glow   { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-spin-slow    { animation: spin 2s linear infinite; }
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    var(--color-bg-overlay)  50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+/* Focus ring */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Divider */
+.divider {
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* Sidebar active item */
+.nav-item-active {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  border-left: 2px solid var(--color-primary);
+}
+
+/* Card hover */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border);
+}
+
+/* Status dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.online  { background: var(--color-success); box-shadow: 0 0 6px var(--color-success); }
+.status-dot.busy    { background: var(--color-error); }
+.status-dot.away    { background: var(--color-warning); }
+.status-dot.offline { background: var(--color-text-muted); }
