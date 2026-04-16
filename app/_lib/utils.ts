@@ -76,19 +76,19 @@ export function truncate(str: string, maxLength: number): string {
 // =====================================================
 export function getStatusColor(status: string): string {
   const map: Record<string, string> = {
-    confirmed:  'text-[var(--color-success)] bg-[var(--color-success-muted)]',
-    pending:    'text-[var(--color-warning)] bg-[var(--color-warning-muted)]',
-    in_progress:'text-[var(--color-primary)] bg-[var(--color-primary-muted)]',
-    completed:  'text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)]',
-    cancelled:  'text-[var(--color-error)] bg-[var(--color-error-muted)]',
-    no_show:    'text-[var(--color-error)] bg-[var(--color-error-muted)]',
-    active:     'text-[var(--color-success)] bg-[var(--color-success-muted)]',
-    inactive:   'text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)]',
-    available:  'text-[var(--color-success)] bg-[var(--color-success-muted)]',
-    occupied:   'text-[var(--color-error)] bg-[var(--color-error-muted)]',
-    maintenance:'text-[var(--color-warning)] bg-[var(--color-warning-muted)]',
+    confirmed:  'text-(--color-success) bg-(--color-success-muted)',
+    pending:    'text-(--color-warning) bg-(--color-warning-muted)',
+    in_progress:'text-(--color-primary) bg-(--color-primary-muted)',
+    completed:  'text-(--color-text-secondary) bg-(--color-bg-elevated)',
+    cancelled:  'text-(--color-error) bg-(--color-error-muted)',
+    no_show:    'text-(--color-error) bg-(--color-error-muted)',
+    active:     'text-(--color-success) bg-(--color-success-muted)',
+    inactive:   'text-(--color-text-secondary) bg-(--color-bg-elevated)',
+    available:  'text-(--color-success) bg-(--color-success-muted)',
+    occupied:   'text-(--color-error) bg-(--color-error-muted)',
+    maintenance:'text-(--color-warning) bg-(--color-warning-muted)',
   };
-  return map[status] ?? 'text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)]';
+  return map[status] ?? 'text-(--color-text-secondary) bg-(--color-bg-elevated)';
 }
 
 export function getStatusLabel(status: string): string {

@@ -13,13 +13,13 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default:   'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)]',
-  primary:   'bg-[var(--color-primary-muted)] text-[var(--color-primary)]',
-  secondary: 'bg-[var(--color-secondary-muted)] text-[var(--color-secondary)]',
-  success:   'bg-[var(--color-success-muted)] text-[var(--color-success)]',
-  warning:   'bg-[var(--color-warning-muted)] text-[var(--color-warning)]',
-  error:     'bg-[var(--color-error-muted)] text-[var(--color-error)]',
-  outline:   'border border-[var(--color-border)] text-[var(--color-text-secondary)] bg-transparent',
+  default:   'bg-(--color-bg-elevated) text-(--color-text-secondary)',
+  primary:   'bg-(--color-primary-muted) text-(--color-primary)',
+  secondary: 'bg-(--color-secondary-muted) text-(--color-secondary)',
+  success:   'bg-(--color-success-muted) text-(--color-success)',
+  warning:   'bg-(--color-warning-muted) text-(--color-warning)',
+  error:     'bg-(--color-error-muted) text-(--color-error)',
+  outline:   'border border-(--color-border) text-(--color-text-secondary) bg-transparent',
 };
 
 const sizeStyles: Record<BadgeSize, string> = {

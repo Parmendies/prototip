@@ -36,7 +36,7 @@ export function Tabs({
     <div
       className={cn(
         'flex gap-1',
-        variant === 'underline' && 'border-b border-[var(--color-border-subtle)] gap-0',
+        variant === 'underline' && 'border-b border-(--color-border-subtle) gap-0',
         className
       )}
     >
@@ -52,20 +52,20 @@ export function Tabs({
               variant === 'default' && [
                 'px-3 py-1.5 rounded-lg',
                 isActive
-                  ? 'bg-[var(--color-primary-muted)] text-[var(--color-primary)]'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)]',
+                  ? 'bg-(--color-primary-muted) text-(--color-primary)'
+                  : 'text-(--color-text-muted) hover:text-(--color-text-secondary) hover:bg-(--color-bg-elevated)',
               ],
               variant === 'pills' && [
                 'px-4 py-2 rounded-full',
                 isActive
-                  ? 'bg-[var(--color-primary)] text-[hsl(222,47%,7%)] font-semibold shadow-[0_0_12px_hsl(172_66%_50%/0.3)]'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]',
+                  ? 'bg-(--color-primary) text-white font-semibold shadow-[0_0_12px_hsl(172_66%_50%/0.3)]'
+                  : 'text-white/80 hover:text-white',
               ],
               variant === 'underline' && [
                 'px-4 py-2.5 border-b-2 -mb-px rounded-none',
                 isActive
-                  ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
-                  : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]',
+                  ? 'border-(--color-primary) text-white'
+                  : 'border-transparent text-(--color-text-muted) hover:text-(--color-text-secondary)',
               ]
             )}
           >
@@ -75,8 +75,8 @@ export function Tabs({
               <span className={cn(
                 'flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold',
                 isActive
-                  ? 'bg-[var(--color-primary)] text-[hsl(222,47%,7%)]'
-                  : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-muted)]'
+                  ? 'bg-white text-(--color-primary)'
+                  : 'bg-(--color-bg-elevated) text-white/80'
               )}>
                 {tab.badge}
               </span>

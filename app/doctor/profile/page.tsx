@@ -33,10 +33,10 @@ export default function DoctorProfilePage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-(--color-border-subtle) bg-(--color-bg-surface) flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-[var(--color-text-primary)]">Mesleki Profilim</h1>
-          <p className="text-xs text-[var(--color-text-muted)]">Hastalara gösterilen bilgilerini güncelle</p>
+          <h1 className="text-lg font-bold text-(--color-text-primary)">Mesleki Profilim</h1>
+          <p className="text-xs text-(--color-text-muted)">Hastalara gösterilen bilgilerini güncelle</p>
         </div>
         <Button
           variant={editing ? 'primary' : 'outline'}
@@ -56,10 +56,10 @@ export default function DoctorProfilePage() {
             {/* Profile card */}
             <Card className="text-center">
               <Avatar firstName={doctor.firstName} lastName={doctor.lastName} size="xl" className="mx-auto mb-3" online />
-              <p className="font-bold text-[var(--color-text-primary)]">
+              <p className="font-bold text-(--color-text-primary)">
                 {doctor.title} {doctor.firstName} {doctor.lastName}
               </p>
-              <p className="text-sm text-[var(--color-text-muted)] mt-0.5">{doctor.specialty}</p>
+              <p className="text-sm text-(--color-text-muted) mt-0.5">{doctor.specialty}</p>
               {dept && (
                 <div className="flex items-center justify-center gap-1.5 mt-2">
                   <span style={{ color: dept.color }}>{dept.icon}</span>
@@ -74,7 +74,7 @@ export default function DoctorProfilePage() {
               </div>
 
               {doctor.availableForOnline && (
-                <div className="mt-3 flex items-center justify-center gap-1.5 text-[var(--color-primary)] text-xs">
+                <div className="mt-3 flex items-center justify-center gap-1.5 text-(--color-primary) text-xs">
                   <Video size={12} /> Online görüşmeye açık
                 </div>
               )}
@@ -82,21 +82,21 @@ export default function DoctorProfilePage() {
 
             {/* Room info */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-3">Konum</p>
-              <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-                <MapPin size={14} className="text-[var(--color-primary)]" />
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wide mb-3">Konum</p>
+              <div className="flex items-center gap-2 text-sm text-(--color-text-secondary)">
+                <MapPin size={14} className="text-(--color-primary)" />
                 <span>{doctor.floor}. Kat — Oda {doctor.roomNumber}</span>
               </div>
             </Card>
 
             {/* Languages */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-3">Diller</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wide mb-3">Diller</p>
               <div className="flex flex-wrap gap-1.5">
                 {doctor.languages?.map(l => (
                   <div key={l} className="flex items-center gap-1 text-xs">
-                    <Globe size={11} className="text-[var(--color-text-muted)]" />
-                    <span className="text-[var(--color-text-secondary)]">{l}</span>
+                    <Globe size={11} className="text-(--color-text-muted)" />
+                    <span className="text-(--color-text-secondary)">{l}</span>
                   </div>
                 ))}
               </div>
@@ -107,13 +107,13 @@ export default function DoctorProfilePage() {
           <div className="col-span-2 space-y-4">
             {/* Personal & Professional Info */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-4">Temel Bilgiler</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wide mb-4">Temel Bilgiler</p>
               {editing ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-[var(--color-text-secondary)]">Ünvan</label>
-                      <select className="px-3 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)]">
+                      <label className="text-sm font-medium text-(--color-text-secondary)">Ünvan</label>
+                      <select className="px-3 py-2.5 text-sm rounded-xl border border-(--color-border) bg-(--color-bg-elevated) text-(--color-text-primary) focus:outline-none focus:border-(--color-primary)">
                         {DOCTOR_TITLES.map(t => (
                           <option key={t} selected={t === doctor.title}>{t}</option>
                         ))}
@@ -123,22 +123,22 @@ export default function DoctorProfilePage() {
                   </div>
                   <Textarea id="profile-bio" label="Kısa Biyografi" defaultValue={doctor.bio} rows={4} />
                   <Input id="profile-experience" label="Deneyim Yılı" type="number" defaultValue={String(doctor.experienceYears)} />
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-bg-elevated)]">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-(--color-bg-elevated)">
                     <div className={cn(
                       'relative w-10 h-5 rounded-full transition-all cursor-pointer',
-                      doctor.availableForOnline ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-overlay)]'
+                      doctor.availableForOnline ? 'bg-(--color-primary)' : 'bg-(--color-bg-overlay)'
                     )}>
                       <div className={cn(
                         'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all',
                         doctor.availableForOnline ? 'left-[22px]' : 'left-0.5'
                       )} />
                     </div>
-                    <span className="text-sm text-[var(--color-text-secondary)]">Online görüşmeye açık</span>
+                    <span className="text-sm text-(--color-text-secondary)">Online görüşmeye açık</span>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{doctor.bio}</p>
+                  <p className="text-sm text-(--color-text-secondary) leading-relaxed">{doctor.bio}</p>
                 </div>
               )}
             </Card>
@@ -146,14 +146,14 @@ export default function DoctorProfilePage() {
             {/* Education */}
             <Card>
               <div className="flex items-center gap-2 mb-3">
-                <GraduationCap size={14} className="text-[var(--color-secondary)]" />
-                <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide">Eğitim</p>
+                <GraduationCap size={14} className="text-(--color-secondary)" />
+                <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wide">Eğitim</p>
               </div>
               <div className="space-y-2">
                 {doctor.education?.map((edu, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-secondary)] mt-1.5 shrink-0" />
-                    <p className="text-sm text-[var(--color-text-secondary)]">{edu}</p>
+                    <div className="w-1.5 h-1.5 rounded-full bg-(--color-secondary) mt-1.5 shrink-0" />
+                    <p className="text-sm text-(--color-text-secondary)">{edu}</p>
                   </div>
                 ))}
               </div>
@@ -162,41 +162,41 @@ export default function DoctorProfilePage() {
             {/* Previous Hospitals */}
             <Card>
               <div className="flex items-center gap-2 mb-3">
-                <Briefcase size={14} className="text-[var(--color-primary)]" />
-                <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide">Önceki Hastaneler</p>
+                <Briefcase size={14} className="text-(--color-primary)" />
+                <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wide">Önceki Hastaneler</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {doctor.previousHospitals?.map((h, i) => (
                   <Badge key={i} variant="outline" size="sm">{h}</Badge>
                 ))}
                 {(!doctor.previousHospitals?.length) && (
-                  <p className="text-sm text-[var(--color-text-muted)]">Kayıtlı hastane yok</p>
+                  <p className="text-sm text-(--color-text-muted)">Kayıtlı hastane yok</p>
                 )}
               </div>
             </Card>
 
             {/* Working schedule */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-3">Çalışma Takvimi</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wide mb-3">Çalışma Takvimi</p>
               <div className="space-y-2">
                 {workDays.map(({ day, isActive, slots }) => (
                   <div key={day} className="flex items-center gap-3">
                     <span className={cn(
                       'w-24 text-xs font-medium shrink-0',
-                      isActive ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-muted)]'
+                      isActive ? 'text-(--color-text-secondary)' : 'text-(--color-text-muted)'
                     )}>
                       {day}
                     </span>
                     {isActive ? (
                       <div className="flex flex-wrap gap-1">
                         {slots.map(s => (
-                          <span key={s} className="px-1.5 py-0.5 text-[10px] rounded-md bg-[var(--color-primary-muted)] text-[var(--color-primary)] font-mono">
+                          <span key={s} className="px-1.5 py-0.5 text-[10px] rounded-md bg-(--color-primary-muted) text-(--color-primary) font-mono">
                             {s}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <span className="text-[10px] text-[var(--color-text-muted)] italic">Kapalı</span>
+                      <span className="text-[10px] text-(--color-text-muted) italic">Kapalı</span>
                     )}
                   </div>
                 ))}
@@ -211,12 +211,12 @@ export default function DoctorProfilePage() {
 
 function StatChip({ value, label, icon, color }: { value: number | string; label: string; icon: React.ReactNode; color: string }) {
   return (
-    <div className="py-2 rounded-xl bg-[var(--color-bg-elevated)] text-center">
+    <div className="py-2 rounded-xl bg-(--color-bg-elevated) text-center">
       <div className={`flex items-center justify-center gap-0.5 text-[var(--color-${color})]`}>
         {icon}
         <span className="text-sm font-bold">{value}</span>
       </div>
-      <p className="text-[9px] text-[var(--color-text-muted)]">{label}</p>
+      <p className="text-[9px] text-(--color-text-muted)">{label}</p>
     </div>
   );
 }

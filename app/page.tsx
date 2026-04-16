@@ -16,7 +16,7 @@ const roles = [
     gradient: 'from-[hsl(172,66%,40%)] to-[hsl(172,66%,28%)]',
     glow: 'hsl(172,66%,50%,0.25)',
     badge: 'Admin Paneli',
-    badgeColor: 'bg-[var(--color-primary-muted)] text-[var(--color-primary)]',
+    badgeColor: 'bg-(--color-primary-muted) text-(--color-primary)',
     features: ['Dashboard & İstatistikler', 'Personel Yönetimi', 'Departman & Oda Düzenleme'],
   },
   {
@@ -28,7 +28,7 @@ const roles = [
     gradient: 'from-[hsl(258,60%,55%)] to-[hsl(258,60%,40%)]',
     glow: 'hsl(258,60%,60%,0.25)',
     badge: 'Doktor Paneli',
-    badgeColor: 'bg-[var(--color-secondary-muted)] text-[var(--color-secondary)]',
+    badgeColor: 'bg-(--color-secondary-muted) text-(--color-secondary)',
     features: ['Günlük & Haftalık Takvim', 'Hasta Dosyaları', 'Online Görüşme'],
   },
   {
@@ -40,7 +40,7 @@ const roles = [
     gradient: 'from-[hsl(38,92%,50%)] to-[hsl(38,92%,38%)]',
     glow: 'hsl(38,92%,55%,0.25)',
     badge: 'Hasta Portalı',
-    badgeColor: 'bg-[var(--color-accent-muted)] text-[var(--color-accent)]',
+    badgeColor: 'bg-(--color-accent-muted) text-(--color-accent)',
     features: ['Randevu Al', 'Randevularım', 'Aile Üyeleri'],
   },
 ];
@@ -71,15 +71,15 @@ export default function LandingPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-lg shadow-[var(--shadow-glow-primary)]">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-(--color-primary) to-(--color-secondary) flex items-center justify-center text-lg shadow-(--shadow-glow-primary)">
             +
           </div>
-          <span className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">
-            Medi<span className="text-[var(--color-primary)]">Panel</span>
+          <span className="text-lg font-bold tracking-tight text-(--color-text-primary)">
+            Medi<span className="text-(--color-primary)">Panel</span>
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs px-2.5 py-1 rounded-full bg-[var(--color-success-muted)] text-[var(--color-success)] font-medium">
+          <span className="text-xs px-2.5 py-1 rounded-full bg-(--color-success-muted) text-(--color-success) font-medium">
             ● Sistem Aktif
           </span>
         </div>
@@ -87,18 +87,18 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center max-w-5xl mx-auto w-full animate-slide-up">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color-primary-muted)] border border-[var(--color-primary)]/20 mb-6 text-sm text-[var(--color-primary)] font-medium">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-(--color-primary-muted) border border-primary/20 mb-6 text-sm text-(--color-primary) font-medium">
           <span>✦</span>
           <span>Multi-Tenant Akıllı Sağlık Platformu</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text-primary)] leading-tight mb-4">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-(--color-text-primary) leading-tight mb-4">
           Hastane Yönetimini
           <br />
           <span className="gradient-text">Bir Üst Seviyeye</span> Taşıyın
         </h1>
 
-        <p className="text-[var(--color-text-secondary)] text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-(--color-text-secondary) text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
           Doktor takvimleri, hasta randevuları ve hastane operasyonlarını tek bir akıllı platformda yönetin.
           AI destekli randevu sistemi ve sosyal medya entegrasyonu ile fark yaratın.
         </p>
@@ -110,7 +110,7 @@ export default function LandingPage() {
               key={role.id}
               href={role.href}
               id={`role-card-${role.id}`}
-              className="group relative rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-6 text-left transition-all duration-300 hover:border-[var(--color-border)] hover:-translate-y-1"
+              className="group relative rounded-2xl border border-(--color-border-subtle) bg-(--color-bg-surface) p-6 text-left transition-all duration-300 hover:border-(--color-border) hover:-translate-y-1"
               style={{
                 ['--glow' as string]: role.glow,
               }}
@@ -131,25 +131,25 @@ export default function LandingPage() {
                 <div className="text-4xl mb-3">{role.emoji}</div>
 
                 {/* Title */}
-                <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-1.5">
+                <h2 className="text-base font-semibold text-(--color-text-primary) mb-1.5">
                   {role.label}
                 </h2>
-                <p className="text-sm text-[var(--color-text-muted)] mb-4 leading-relaxed">
+                <p className="text-sm text-(--color-text-muted) mb-4 leading-relaxed">
                   {role.description}
                 </p>
 
                 {/* Features */}
                 <ul className="space-y-1.5 mb-5">
                   {role.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-                      <span className="text-[var(--color-primary)] shrink-0">✓</span>
+                    <li key={f} className="flex items-center gap-2 text-xs text-(--color-text-secondary)">
+                      <span className="text-(--color-primary) shrink-0">✓</span>
                       {f}
                     </li>
                   ))}
                 </ul>
 
                 {/* CTA */}
-                <div className="flex items-center gap-2 text-sm font-medium text-[var(--color-primary)] group-hover:gap-3 transition-all duration-200">
+                <div className="flex items-center gap-2 text-sm font-medium text-(--color-primary) group-hover:gap-3 transition-all duration-200">
                   <span>Giriş Yap</span>
                   <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
                 </div>
@@ -160,7 +160,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-6 text-center text-xs text-[var(--color-text-muted)]">
+      <footer className="py-6 text-center text-xs text-(--color-text-muted)">
         MediPanel v1.0 — MVP Prototipi &copy; 2026
       </footer>
     </main>

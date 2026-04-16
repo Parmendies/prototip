@@ -6,7 +6,7 @@ import { Button } from '@/app/_components/ui/Button';
 import { Input, Textarea } from '@/app/_components/ui/Input';
 import { Badge } from '@/app/_components/ui/Badge';
 import { useState } from 'react';
-import { Building2, MapPin, Phone, Mail, Globe, Clock, ChevronRight, Check } from 'lucide-react';
+import { Building2, Phone, Mail, Globe, Clock, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/app/_lib/utils';
 
 const steps = [
@@ -51,19 +51,19 @@ export default function HospitalSetupPage() {
                 className={cn(
                   'flex items-center gap-2 text-sm font-medium transition-all',
                   step === s.id
-                    ? 'text-[var(--color-primary)]'
+                    ? 'text-(--color-primary)'
                     : step > s.id
-                    ? 'text-[var(--color-success)]'
-                    : 'text-[var(--color-text-muted)]'
+                    ? 'text-(--color-success)'
+                    : 'text-(--color-text-muted)'
                 )}
               >
                 <span className={cn(
                   'w-7 h-7 rounded-full flex items-center justify-center text-xs border-2 transition-all',
                   step === s.id
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary-muted)] text-[var(--color-primary)]'
+                    ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
                     : step > s.id
-                    ? 'border-[var(--color-success)] bg-[var(--color-success-muted)] text-[var(--color-success)]'
-                    : 'border-[var(--color-border)] text-[var(--color-text-muted)]'
+                    ? 'border-(--color-success) bg-(--color-success-muted) text-(--color-success)'
+                    : 'border-(--color-border) text-(--color-text-muted)'
                 )}>
                   {step > s.id ? <Check size={12} /> : s.id}
                 </span>
@@ -72,7 +72,7 @@ export default function HospitalSetupPage() {
               {i < steps.length - 1 && (
                 <div className={cn(
                   'flex-1 h-0.5 mx-3 transition-colors',
-                  step > s.id ? 'bg-[var(--color-success)]' : 'bg-[var(--color-border-subtle)]'
+                  step > s.id ? 'bg-(--color-success)' : 'bg-(--color-border-subtle)'
                 )} />
               )}
             </div>
@@ -86,20 +86,20 @@ export default function HospitalSetupPage() {
             {/* STEP 1 */}
             {step === 1 && (
               <Card className="animate-slide-up space-y-5">
-                <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Temel Bilgiler</h2>
+                <h2 className="text-sm font-semibold text-(--color-text-primary)">Temel Bilgiler</h2>
 
                 {/* Logo upload */}
                 <div>
-                  <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">Hastane Logosu</p>
+                  <p className="text-sm font-medium text-(--color-text-secondary) mb-2">Hastane Logosu</p>
                   <div
                     id="logo-upload-area"
-                    className="border-2 border-dashed border-[var(--color-border)] rounded-xl p-8 text-center cursor-pointer hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-muted)] transition-all duration-200 group"
+                    className="border-2 border-dashed border-(--color-border) rounded-xl p-8 text-center cursor-pointer hover:border-(--color-primary) hover:bg-(--color-primary-muted) transition-all duration-200 group"
                   >
                     <div className="text-3xl mb-2">🏥</div>
-                    <p className="text-sm text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] transition-colors">
+                    <p className="text-sm text-(--color-text-muted) group-hover:text-(--color-primary) transition-colors">
                       Logo yüklemek için tıklayın veya sürükleyin
                     </p>
-                    <p className="text-xs text-[var(--color-text-muted)] mt-1">PNG, JPG, SVG — Maks. 2 MB</p>
+                    <p className="text-xs text-(--color-text-muted) mt-1">PNG, JPG, SVG — Maks. 2 MB</p>
                   </div>
                 </div>
 
@@ -109,7 +109,7 @@ export default function HospitalSetupPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <Input id="hospital-city" label="Şehir" placeholder="İstanbul" defaultValue="İstanbul" />
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-[var(--color-text-secondary)]">Durum</label>
+                    <label className="text-sm font-medium text-(--color-text-secondary)">Durum</label>
                     <div className="flex gap-2 mt-1">
                       {['Aktif', 'Pasif'].map((s) => (
                         <button
@@ -117,8 +117,8 @@ export default function HospitalSetupPage() {
                           className={cn(
                             'px-3 py-2 rounded-xl text-sm border transition-all',
                             s === 'Aktif'
-                              ? 'border-[var(--color-success)] bg-[var(--color-success-muted)] text-[var(--color-success)]'
-                              : 'border-[var(--color-border)] text-[var(--color-text-muted)]'
+                              ? 'border-(--color-success) bg-(--color-success-muted) text-(--color-success)'
+                              : 'border-(--color-border) text-(--color-text-muted)'
                           )}
                         >
                           {s}
@@ -135,7 +135,7 @@ export default function HospitalSetupPage() {
             {/* STEP 2 */}
             {step === 2 && (
               <Card className="animate-slide-up space-y-5">
-                <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">İletişim Bilgileri</h2>
+                <h2 className="text-sm font-semibold text-(--color-text-primary)">İletişim Bilgileri</h2>
                 <Input id="hospital-phone" label="Telefon" placeholder="+90 212 000 0000" leftIcon={<Phone size={14} />} defaultValue="+90 212 555 0100" />
                 <Input id="hospital-email" label="E-posta" type="email" placeholder="info@hastane.com" leftIcon={<Mail size={14} />} defaultValue="info@medikum.com.tr" />
                 <Input id="hospital-website" label="Web Sitesi" placeholder="www.hastane.com" leftIcon={<Globe size={14} />} defaultValue="www.medikum.com.tr" />
@@ -143,17 +143,17 @@ export default function HospitalSetupPage() {
                 <div className="pt-2 divider" />
 
                 {/* Meta Integration preview */}
-                <h3 className="text-sm font-semibold text-[var(--color-text-primary)] pt-2">Meta Entegrasyonu</h3>
-                <p className="text-xs text-[var(--color-text-muted)]">Instagram ve Telegram Business hesabınızı bağlayarak sosyal medyadan gelen hastaları otomatik kaydedin.</p>
+                <h3 className="text-sm font-semibold text-(--color-text-primary) pt-2">Meta Entegrasyonu</h3>
+                <p className="text-xs text-(--color-text-muted)">Instagram ve Telegram Business hesabınızı bağlayarak sosyal medyadan gelen hastaları otomatik kaydedin.</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { name: 'Instagram Business', icon: '📷', status: 'Bağlı', color: 'success' },
                     { name: 'Telegram Page', icon: 'f', status: 'Bağlı Değil', color: 'warning' },
                   ].map((meta) => (
-                    <div key={meta.name} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+                    <div key={meta.name} className="flex items-center gap-3 p-3 rounded-xl border border-(--color-border-subtle) bg-(--color-bg-elevated)">
                       <span className="text-2xl">{meta.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-[var(--color-text-primary)] truncate">{meta.name}</p>
+                        <p className="text-xs font-medium text-(--color-text-primary) truncate">{meta.name}</p>
                         <Badge status={meta.status === 'Bağlı' ? 'active' : 'pending'} size="xs" dot>{meta.status}</Badge>
                       </div>
                       <Button variant="outline" size="xs">
@@ -168,12 +168,12 @@ export default function HospitalSetupPage() {
             {/* STEP 3 */}
             {step === 3 && (
               <Card className="animate-slide-up space-y-5">
-                <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Vizyon, Misyon & Çalışma Saatleri</h2>
+                <h2 className="text-sm font-semibold text-(--color-text-primary)">Vizyon, Misyon & Çalışma Saatleri</h2>
                 <Textarea id="hospital-vision" label="Vizyon" placeholder="Hastane vizyonunuz..." rows={3} defaultValue="Hasta odaklı, teknoloji destekli sağlık deneyiminde İstanbul'un referans hastanesi olmak." />
                 <Textarea id="hospital-mission" label="Misyon" placeholder="Hastane misyonunuz..." rows={3} defaultValue="Her hastaya bireysel ilgi göstererek, en güncel tıbbi yöntemlerle şifaya ulaşmalarını sağlamak." />
 
                 <div className="pt-2 divider" />
-                <h3 className="text-sm font-semibold text-[var(--color-text-primary)] pt-2">Çalışma Saatleri</h3>
+                <h3 className="text-sm font-semibold text-(--color-text-primary) pt-2">Çalışma Saatleri</h3>
                 <div className="space-y-2">
                   {hours.map((h, i) => (
                     <div key={h.day} className="flex items-center gap-3">
@@ -182,26 +182,26 @@ export default function HospitalSetupPage() {
                         className={cn(
                           'w-5 h-5 rounded flex items-center justify-center border-2 transition-all shrink-0',
                           h.isOpen
-                            ? 'border-[var(--color-primary)] bg-[var(--color-primary)]'
-                            : 'border-[var(--color-border)]'
+                            ? 'border-(--color-primary) bg-(--color-primary)'
+                            : 'border-(--color-border)'
                         )}
                         aria-label={`${h.day} ${h.isOpen ? 'kapat' : 'aç'}`}
                       >
                         {h.isOpen && <Check size={10} className="text-[hsl(222,47%,7%)]" />}
                       </button>
-                      <span className="text-sm text-[var(--color-text-secondary)] w-24 shrink-0">{h.day}</span>
+                      <span className="text-sm text-(--color-text-secondary) w-24 shrink-0">{h.day}</span>
                       {h.isOpen ? (
                         <>
                           <select
-                            className="px-2 py-1 text-xs rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)]"
+                            className="px-2 py-1 text-xs rounded-lg border border-(--color-border) bg-(--color-bg-elevated) text-(--color-text-primary) focus:outline-none focus:border-(--color-primary)"
                             value={h.start}
                             onChange={e => setHours(prev => prev.map((x, j) => j === i ? { ...x, start: e.target.value } : x))}
                           >
                             {['08:00','09:00','10:00'].map(t => <option key={t}>{t}</option>)}
                           </select>
-                          <span className="text-[var(--color-text-muted)] text-xs">—</span>
+                          <span className="text-(--color-text-muted) text-xs">—</span>
                           <select
-                            className="px-2 py-1 text-xs rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)]"
+                            className="px-2 py-1 text-xs rounded-lg border border-(--color-border) bg-(--color-bg-elevated) text-(--color-text-primary) focus:outline-none focus:border-(--color-primary)"
                             value={h.end}
                             onChange={e => setHours(prev => prev.map((x, j) => j === i ? { ...x, end: e.target.value } : x))}
                           >
@@ -209,7 +209,7 @@ export default function HospitalSetupPage() {
                           </select>
                         </>
                       ) : (
-                        <span className="text-xs text-[var(--color-text-muted)] italic">Kapalı</span>
+                        <span className="text-xs text-(--color-text-muted) italic">Kapalı</span>
                       )}
                     </div>
                   ))}
@@ -245,36 +245,36 @@ export default function HospitalSetupPage() {
           {/* Preview card */}
           <div className="space-y-4">
             <Card glass>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] mb-3 uppercase tracking-wider">Ön İzleme</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) mb-3 uppercase tracking-wider">Ön İzleme</p>
               <div className="text-center py-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-2xl mx-auto mb-3 shadow-[var(--shadow-glow-primary)]">
+                <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-(--color-primary) to-(--color-secondary) flex items-center justify-center text-2xl mx-auto mb-3 shadow-(--shadow-glow-primary)">
                   🏥
                 </div>
-                <h3 className="font-bold text-[var(--color-text-primary)]">Özel Medikum</h3>
-                <p className="text-xs text-[var(--color-text-muted)] mt-1">İstanbul</p>
+                <h3 className="font-bold text-(--color-text-primary)">Özel Medikum</h3>
+                <p className="text-xs text-(--color-text-muted) mt-1">İstanbul</p>
                 <Badge status="active" dot size="xs" className="mt-2">Aktif</Badge>
               </div>
               <div className="space-y-2 pt-3 divider">
-                <p className="pt-3 text-xs text-[var(--color-text-muted)]">info@medikum.com.tr</p>
-                <p className="text-xs text-[var(--color-text-muted)]">+90 212 555 0100</p>
-                <p className="text-xs text-[var(--color-text-muted)]">www.medikum.com.tr</p>
+                <p className="pt-3 text-xs text-(--color-text-muted)">info@medikum.com.tr</p>
+                <p className="text-xs text-(--color-text-muted)">+90 212 555 0100</p>
+                <p className="text-xs text-(--color-text-muted)">www.medikum.com.tr</p>
               </div>
             </Card>
 
             <Card>
-              <p className="text-xs font-medium text-[var(--color-text-muted)] mb-2">Adımlar</p>
+              <p className="text-xs font-medium text-(--color-text-muted) mb-2">Adımlar</p>
               {steps.map((s) => (
                 <div key={s.id} className={cn(
                   'flex items-center gap-2 py-1.5 text-xs',
-                  step >= s.id ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-muted)]'
+                  step >= s.id ? 'text-(--color-text-secondary)' : 'text-(--color-text-muted)'
                 )}>
                   <span className={cn(
                     'w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0',
                     step > s.id
-                      ? 'bg-[var(--color-success)] text-white'
+                      ? 'bg-(--color-success) text-white'
                       : step === s.id
-                      ? 'bg-[var(--color-primary)] text-[hsl(222,47%,7%)]'
-                      : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-muted)]'
+                      ? 'bg-(--color-primary) text-[hsl(222,47%,7%)]'
+                      : 'bg-(--color-bg-elevated) text-(--color-text-muted)'
                   )}>
                     {step > s.id ? '✓' : s.id}
                   </span>

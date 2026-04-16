@@ -63,8 +63,8 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
         className={cn(
-          'relative w-full rounded-2xl border border-[var(--color-border)]',
-          'bg-[var(--color-bg-surface)] shadow-[0_24px_80px_hsl(222,47%,4%,0.8)]',
+          'relative w-full rounded-2xl border border-(--color-border)',
+          'bg-(--color-bg-surface) shadow-[0_24px_80px_hsl(222,47%,4%,0.8)]',
           'animate-scale-in',
           sizeStyles[size],
           className
@@ -72,23 +72,26 @@ export function Modal({
       >
         {/* Header */}
         {(title || subtitle) && (
-          <div className="flex items-start justify-between gap-4 p-5 border-b border-[var(--color-border-subtle)]">
+          <div className="flex items-start justify-between gap-4 p-5 border-b border-(--color-border-subtle)">
             <div>
               {title && (
-                <h2 id="modal-title" className="text-base font-semibold text-[var(--color-text-primary)]">
+                <h2
+                  id="modal-title"
+                  className="text-base font-semibold text-white"
+                >
                   {title}
                 </h2>
               )}
               {subtitle && (
-                <p className="text-sm text-[var(--color-text-muted)] mt-0.5">{subtitle}</p>
+                <p className="text-sm text-(--color-text-muted) mt-0.5">{subtitle}</p>
               )}
             </div>
             <button
               onClick={onClose}
               className={cn(
                 'shrink-0 p-1.5 rounded-lg transition-colors',
-                'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]',
-                'hover:bg-[var(--color-bg-elevated)]'
+                'text-(--color-text-muted) hover:text-(--color-text-primary)',
+                'hover:bg-(--color-bg-elevated)'
               )}
               aria-label="Kapat"
             >
@@ -102,7 +105,7 @@ export function Modal({
 
         {/* Footer */}
         {footer && (
-          <div className="p-5 border-t border-[var(--color-border-subtle)]">
+          <div className="p-5 border-t border-(--color-border-subtle)">
             {footer}
           </div>
         )}

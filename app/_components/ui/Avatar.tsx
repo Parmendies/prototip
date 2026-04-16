@@ -60,7 +60,7 @@ export function Avatar({
           src={src}
           alt={`${firstName} ${lastName}`}
           className={cn(
-            'rounded-full object-cover ring-2 ring-[var(--color-border)]',
+            'rounded-full object-cover ring-2 ring-(--color-border)',
             sizeStyles[size]
           )}
         />
@@ -68,7 +68,7 @@ export function Avatar({
         <div
           className={cn(
             'rounded-full flex items-center justify-center font-semibold text-white',
-            'bg-gradient-to-br ring-2 ring-[var(--color-border)]',
+            'bg-linear-to-br ring-2 ring-(--color-border)',
             gradient,
             sizeStyles[size]
           )}
@@ -79,8 +79,8 @@ export function Avatar({
       {online !== undefined && (
         <span
           className={cn(
-            'absolute rounded-full ring-2 ring-[var(--color-bg-surface)]',
-            online ? 'bg-[var(--color-success)]' : 'bg-[var(--color-text-muted)]',
+            'absolute rounded-full ring-2 ring-(--color-bg-surface)',
+            online ? 'bg-(--color-success)' : 'bg-(--color-text-muted)',
             dotSizeStyles[size]
           )}
         />

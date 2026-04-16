@@ -13,9 +13,9 @@ import { cn, getStatusLabel } from '@/app/_lib/utils';
 import type { Room, RoomStatus } from '@/app/_types/hospital';
 
 const statusColor: Record<RoomStatus, string> = {
-  available:   'border-[var(--color-success)]/40 bg-[var(--color-success-muted)]',
-  occupied:    'border-[var(--color-error)]/40 bg-[var(--color-error-muted)]',
-  maintenance: 'border-[var(--color-warning)]/40 bg-[var(--color-warning-muted)]',
+  available:   'border-(--color-success)/40 bg-(--color-success-muted)',
+  occupied:    'border-(--color-error)/40 bg-(--color-error-muted)',
+  maintenance: 'border-(--color-warning)/40 bg-(--color-warning-muted)',
 };
 
 const roomTypeLabel: Record<string, string> = {
@@ -62,8 +62,8 @@ export default function RoomsPage() {
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{emoji}</span>
                 <div>
-                  <p className="text-xl font-bold text-[var(--color-text-primary)]">{counts[k]}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{label}</p>
+                  <p className="text-xl font-bold text-(--color-text-primary)">{counts[k]}</p>
+                  <p className="text-xs text-(--color-text-muted)">{label}</p>
                 </div>
               </div>
             </Card>
@@ -80,14 +80,14 @@ export default function RoomsPage() {
           {floors.map(([floor, floorRooms]) => (
             <div key={floor}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-[var(--color-bg-elevated)] flex items-center justify-center text-xs font-bold text-[var(--color-text-secondary)]">
+                <div className="w-7 h-7 rounded-lg bg-(--color-bg-elevated) flex items-center justify-center text-xs font-bold text-(--color-text-secondary)">
                   {floor}
                 </div>
-                <h3 className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                <h3 className="text-sm font-semibold text-(--color-text-secondary)">
                   {floor === 0 ? 'Zemin Kat' : `${floor}. Kat`}
                 </h3>
-                <div className="flex-1 h-px bg-[var(--color-border-subtle)]" />
-                <span className="text-xs text-[var(--color-text-muted)]">{floorRooms.length} oda</span>
+                <div className="flex-1 h-px bg-(--color-border-subtle)" />
+                <span className="text-xs text-(--color-text-muted)">{floorRooms.length} oda</span>
               </div>
 
               <div className="grid grid-cols-3 xl:grid-cols-5 gap-3">
@@ -103,11 +103,11 @@ export default function RoomsPage() {
                       )}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <DoorOpen size={16} className="text-[var(--color-text-muted)]" />
+                        <DoorOpen size={16} className="text-(--color-text-muted)" />
                         <Badge status={room.status} size="xs" />
                       </div>
-                      <p className="text-base font-bold text-[var(--color-text-primary)]">{room.number}</p>
-                      <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">{roomTypeLabel[room.type]}</p>
+                      <p className="text-base font-bold text-(--color-text-primary)">{room.number}</p>
+                      <p className="text-[10px] text-(--color-text-muted) mt-0.5">{roomTypeLabel[room.type]}</p>
                       {dept && (
                         <p className="text-[10px] mt-1 font-medium" style={{ color: dept.color }}>
                           {dept.icon} {dept.name}
@@ -137,8 +137,8 @@ export default function RoomsPage() {
           <Input id="room-number" label="Oda No" placeholder="Örn: 101" required />
           <Input id="room-floor" label="Kat" type="number" placeholder="1" required />
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[var(--color-text-secondary)]">Oda Tipi</label>
-            <select className="px-3.5 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)]">
+            <label className="text-sm font-medium text-(--color-text-secondary)">Oda Tipi</label>
+            <select className="px-3.5 py-2.5 text-sm rounded-xl border border-(--color-border) bg-(--color-bg-elevated) text-(--color-text-primary) focus:outline-none focus:border-(--color-primary)">
               <option value="polyclinic">Poliklinik</option>
               <option value="examination">Muayene Odası</option>
               <option value="operation">Ameliyathane</option>
@@ -146,15 +146,15 @@ export default function RoomsPage() {
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[var(--color-text-secondary)]">Departman</label>
-            <select className="px-3.5 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)]">
+            <label className="text-sm font-medium text-(--color-text-secondary)">Departman</label>
+            <select className="px-3.5 py-2.5 text-sm rounded-xl border border-(--color-border) bg-(--color-bg-elevated) text-(--color-text-primary) focus:outline-none focus:border-(--color-primary)">
               {mockDepartments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
             </select>
           </div>
           <Input id="room-capacity" label="Kapasite" type="number" placeholder="1" defaultValue="1" />
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[var(--color-text-secondary)]">Durum</label>
-            <select className="px-3.5 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)]">
+            <label className="text-sm font-medium text-(--color-text-secondary)">Durum</label>
+            <select className="px-3.5 py-2.5 text-sm rounded-xl border border-(--color-border) bg-(--color-bg-elevated) text-(--color-text-primary) focus:outline-none focus:border-(--color-primary)">
               <option value="available">Müsait</option>
               <option value="occupied">Dolu</option>
               <option value="maintenance">Bakımda</option>

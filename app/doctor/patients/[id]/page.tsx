@@ -42,20 +42,20 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] flex items-center gap-4">
+      <div className="px-6 py-4 border-b border-(--color-border-subtle) bg-(--color-bg-surface) flex items-center gap-4">
         <Link href="/doctor/patients">
           <Button variant="ghost" size="sm" icon={<ArrowLeft size={14} />} aria-label="Geri" />
         </Link>
         <Avatar firstName={patient.firstName} lastName={patient.lastName} size="md" online />
         <div className="flex-1">
-          <h1 className="text-base font-bold text-[var(--color-text-primary)]">
+          <h1 className="text-base font-bold text-(--color-text-primary)">
             {patient.firstName} {patient.lastName}
           </h1>
           <div className="flex items-center gap-3 mt-0.5">
             <Badge status={patient.status} dot size="xs" />
             {patient.bloodType && <Badge variant="outline" size="xs">{patient.bloodType}</Badge>}
             {patient.birthDate && (
-              <span className="text-[11px] text-[var(--color-text-muted)]">
+              <span className="text-[11px] text-(--color-text-muted)">
                 {new Date().getFullYear() - new Date(patient.birthDate).getFullYear()} yaş
               </span>
             )}
@@ -68,7 +68,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Tabs */}
-      <div className="px-6 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]">
+      <div className="px-6 border-b border-(--color-border-subtle) bg-(--color-bg-surface)">
         <Tabs tabs={tabs} defaultTab="overview" onChange={setActiveTab} variant="underline" />
       </div>
 
@@ -79,7 +79,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
           <div className="grid grid-cols-3 gap-4">
             {/* Contact */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">İletişim</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider mb-3">İletişim</p>
               <div className="space-y-2.5">
                 <InfoRow icon={<Phone size={13} />} label="Telefon" value={patient.phone} />
                 <InfoRow icon={<Mail size={13} />} label="E-posta" value={patient.email} />
@@ -88,21 +88,21 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
               {patient.emergencyContact && (
                 <>
                   <div className="my-3 divider" />
-                  <p className="text-xs font-semibold text-[var(--color-text-muted)] mb-2">Acil İletişim</p>
-                  <p className="text-sm text-[var(--color-text-primary)]">{patient.emergencyContact.name}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{patient.emergencyContact.relation} — {patient.emergencyContact.phone}</p>
+                  <p className="text-xs font-semibold text-(--color-text-muted) mb-2">Acil İletişim</p>
+                  <p className="text-sm text-(--color-text-primary)">{patient.emergencyContact.name}</p>
+                  <p className="text-xs text-(--color-text-muted)">{patient.emergencyContact.relation} — {patient.emergencyContact.phone}</p>
                 </>
               )}
             </Card>
 
             {/* Medical */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Tıbbi Bilgiler</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider mb-3">Tıbbi Bilgiler</p>
               {patient.medicalHistory && patient.medicalHistory.length > 0 && (
                 <div className="mb-3">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Heart size={12} className="text-[var(--color-error)]" />
-                    <p className="text-xs font-medium text-[var(--color-text-secondary)]">Hastalık Geçmişi</p>
+                    <Heart size={12} className="text-(--color-error)" />
+                    <p className="text-xs font-medium text-(--color-text-secondary)">Hastalık Geçmişi</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {patient.medicalHistory.map(h => (
@@ -114,8 +114,8 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
               {patient.allergies && patient.allergies.length > 0 && (
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
-                    <AlertTriangle size={12} className="text-[var(--color-warning)]" />
-                    <p className="text-xs font-medium text-[var(--color-text-secondary)]">Alerjiler</p>
+                    <AlertTriangle size={12} className="text-(--color-warning)" />
+                    <p className="text-xs font-medium text-(--color-text-secondary)">Alerjiler</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {patient.allergies.map(a => (
@@ -125,21 +125,21 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               )}
               {(!patient.medicalHistory?.length && !patient.allergies?.length) && (
-                <p className="text-sm text-[var(--color-text-muted)]">Kayıtlı bilgi yok</p>
+                <p className="text-sm text-(--color-text-muted)">Kayıtlı bilgi yok</p>
               )}
             </Card>
 
             {/* Summary */}
             <Card>
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Özet</p>
+              <p className="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider mb-3">Özet</p>
               <div className="grid grid-cols-2 gap-2 mb-3">
-                <div className="text-center py-3 rounded-xl bg-[var(--color-bg-elevated)]">
-                  <p className="text-xl font-bold text-[var(--color-primary)]">{appointments.length}</p>
-                  <p className="text-[10px] text-[var(--color-text-muted)]">Toplam Randevu</p>
+                <div className="text-center py-3 rounded-xl bg-(--color-bg-elevated)">
+                  <p className="text-xl font-bold text-(--color-primary)">{appointments.length}</p>
+                  <p className="text-[10px] text-(--color-text-muted)">Toplam Randevu</p>
                 </div>
-                <div className="text-center py-3 rounded-xl bg-[var(--color-bg-elevated)]">
-                  <p className="text-xl font-bold text-[var(--color-success)]">{appointments.filter(a => a.status === 'completed').length}</p>
-                  <p className="text-[10px] text-[var(--color-text-muted)]">Tamamlanan</p>
+                <div className="text-center py-3 rounded-xl bg-(--color-bg-elevated)">
+                  <p className="text-xl font-bold text-(--color-success)">{appointments.filter(a => a.status === 'completed').length}</p>
+                  <p className="text-[10px] text-(--color-text-muted)">Tamamlanan</p>
                 </div>
               </div>
               {patient.idNumber && (
@@ -155,9 +155,9 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
               <Card key={apt.id}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-center p-2 rounded-xl bg-[var(--color-bg-elevated)] min-w-[52px] text-center">
-                      <span className="text-xs font-bold text-[var(--color-text-primary)]">{apt.startTime}</span>
-                      <span className="text-[10px] text-[var(--color-text-muted)] font-mono">{apt.date.slice(5)}</span>
+                    <div className="flex flex-col items-center p-2 rounded-xl bg-(--color-bg-elevated) min-w-[52px] text-center">
+                      <span className="text-xs font-bold text-(--color-text-primary)">{apt.startTime}</span>
+                      <span className="text-[10px] text-(--color-text-muted) font-mono">{apt.date.slice(5)}</span>
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -165,14 +165,14 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                         <Badge status={apt.status} dot size="xs" />
                       </div>
                       {apt.complaint && (
-                        <p className="text-sm text-[var(--color-text-secondary)] mt-1">{apt.complaint}</p>
+                        <p className="text-sm text-(--color-text-secondary) mt-1">{apt.complaint}</p>
                       )}
                       {apt.note && (
-                        <p className="text-xs text-[var(--color-text-muted)] mt-1 italic">Not: {apt.note}</p>
+                        <p className="text-xs text-(--color-text-muted) mt-1 italic">Not: {apt.note}</p>
                       )}
                     </div>
                   </div>
-                  <span className="text-[11px] text-[var(--color-text-muted)] whitespace-nowrap">{formatDate(apt.date)}</span>
+                  <span className="text-[11px] text-(--color-text-muted) whitespace-nowrap">{formatDate(apt.date)}</span>
                 </div>
               </Card>
             ))}
@@ -183,12 +183,12 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
           <div className="space-y-2 max-w-2xl">
             {mockDocuments.map(doc => (
               <Card key={doc.id} hover className="flex items-center gap-4 py-3">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-bg-elevated)] flex items-center justify-center text-lg shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-(--color-bg-elevated) flex items-center justify-center text-lg shrink-0">
                   {doc.type === 'pdf' ? '📄' : doc.type === 'image' ? '🖼️' : '📝'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{doc.name}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{doc.size} — {formatDate(doc.date)}</p>
+                  <p className="text-sm font-medium text-(--color-text-primary) truncate">{doc.name}</p>
+                  <p className="text-xs text-(--color-text-muted)">{doc.size} — {formatDate(doc.date)}</p>
                 </div>
                 <Button variant="outline" size="xs">İndir</Button>
               </Card>
@@ -211,8 +211,8 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                 .filter(a => a.patientId === patient.id && a.note)
                 .map(a => (
                   <Card key={a.id}>
-                    <p className="text-xs text-[var(--color-text-muted)] mb-1">{formatDate(a.date)}</p>
-                    <p className="text-sm text-[var(--color-text-secondary)]">{a.note}</p>
+                    <p className="text-xs text-(--color-text-muted) mb-1">{formatDate(a.date)}</p>
+                    <p className="text-sm text-(--color-text-secondary)">{a.note}</p>
                   </Card>
                 ))}
             </div>
@@ -226,10 +226,10 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="text-[var(--color-text-muted)] shrink-0">{icon}</span>
+      <span className="text-(--color-text-muted) shrink-0">{icon}</span>
       <div className="min-w-0">
-        <p className="text-[10px] text-[var(--color-text-muted)]">{label}</p>
-        <p className="text-xs text-[var(--color-text-secondary)] truncate">{value}</p>
+        <p className="text-[10px] text-(--color-text-muted)">{label}</p>
+        <p className="text-xs text-(--color-text-secondary) truncate">{value}</p>
       </div>
     </div>
   );

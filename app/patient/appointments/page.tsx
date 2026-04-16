@@ -8,7 +8,6 @@ import { mockAppointments, mockDoctors, mockPatients } from '@/app/_lib/mock-dat
 import { Tabs, useTabs } from '@/app/_components/ui/Tabs';
 import { Video, MapPin, Clock, XCircle, RefreshCw, ChevronRight } from 'lucide-react';
 import { formatDate } from '@/app/_lib/utils';
-import { cn } from '@/app/_lib/utils';
 
 const patient = mockPatients[0];
 
@@ -32,9 +31,9 @@ export default function PatientAppointmentsPage() {
          <div>
         <div className="w-150" />
       </div>
-      <div className="sticky top-0 z-20 bg-[var(--color-bg-base)]/90 backdrop-blur-xl px-4 pt-4 pb-3 border-b border-[var(--color-border-subtle)]">
-        <h1 className="text-xl font-bold text-[var(--color-text-primary)]">Randevularım</h1>
-        <p className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+      <div className="sticky top-0 z-20 bg-(--color-bg-base)/90 backdrop-blur-xl px-4 pt-4 pb-3 border-b border-(--color-border-subtle)">
+        <h1 className="text-xl font-bold text-(--color-text-primary)">Randevularım</h1>
+        <p className="text-[11px] text-(--color-text-muted) mt-0.5">
           Merhaba, {patient.firstName} 👋
         </p>
       </div>
@@ -44,19 +43,19 @@ export default function PatientAppointmentsPage() {
       {upcoming[0] && (() => {
         const doctor = mockDoctors.find(d => d.id === upcoming[0].doctorId);
         return (
-          <div className="mb-5 p-4 rounded-2xl bg-gradient-to-br from-[var(--color-primary-muted)] to-[var(--color-bg-elevated)] border border-[var(--color-primary)]/30 animate-slide-up">
-            <p className="text-xs font-semibold text-[var(--color-primary)] mb-2 uppercase tracking-wide">Sonraki Randevu</p>
+          <div className="mb-5 p-4 rounded-2xl bg-linear-to-br from-(--color-primary-muted) to-(--color-bg-elevated) border border-primary/30 animate-slide-up">
+            <p className="text-xs font-semibold text-(--color-primary) mb-2 uppercase tracking-wide">Sonraki Randevu</p>
             <div className="flex items-center gap-3">
               <Avatar firstName={doctor?.firstName} lastName={doctor?.lastName} size="md" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[var(--color-text-primary)] truncate">
+                <p className="text-sm font-bold text-(--color-text-primary) truncate">
                   {doctor?.title} {doctor?.lastName}
                 </p>
-                <p className="text-xs text-[var(--color-text-muted)]">{doctor?.specialty}</p>
+                <p className="text-xs text-(--color-text-muted)">{doctor?.specialty}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-sm font-bold text-[var(--color-text-primary)] font-mono">{upcoming[0].startTime}</p>
-                <p className="text-[10px] text-[var(--color-text-muted)]">{upcoming[0].date.slice(5).replace('-', '/')}</p>
+                <p className="text-sm font-bold text-(--color-text-primary) font-mono">{upcoming[0].startTime}</p>
+                <p className="text-[10px] text-(--color-text-muted)">{upcoming[0].date.slice(5).replace('-', '/')}</p>
               </div>
             </div>
             <div className="flex gap-2 mt-3">
@@ -79,7 +78,7 @@ export default function PatientAppointmentsPage() {
         {displayed.length === 0 && (
           <div className="text-center py-12">
             <p className="text-4xl mb-3">📭</p>
-            <p className="text-sm text-[var(--color-text-muted)]">
+            <p className="text-sm text-(--color-text-muted)">
               {activeTab === 'upcoming' ? 'Yaklaşan randevunuz yok' : 'Geçmiş randevu yok'}
             </p>
           </div>
@@ -89,6 +88,7 @@ export default function PatientAppointmentsPage() {
           const isUpcoming = ['confirmed', 'pending'].includes(apt.status);
           // 24h rule for cancel
           const aptDateTime = new Date(`${apt.date}T${apt.startTime}`);
+          // eslint-disable-next-line react-hooks/purity
           const hoursUntil  = (aptDateTime.getTime() - Date.now()) / 3600000;
           const canCancel   = hoursUntil > 24;
           const canReschedule = hoursUntil > 12;
@@ -98,10 +98,10 @@ export default function PatientAppointmentsPage() {
               <div className="flex items-start gap-3 mb-3">
                 <Avatar firstName={doctor?.firstName} lastName={doctor?.lastName} size="md" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-[var(--color-text-primary)]">
+                  <p className="text-sm font-bold text-(--color-text-primary)">
                     {doctor?.title} {doctor?.lastName}
                   </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{doctor?.specialty}</p>
+                  <p className="text-xs text-(--color-text-muted)">{doctor?.specialty}</p>
                 </div>
                 <Badge status={apt.status} dot size="xs" />
               </div>
@@ -129,11 +129,11 @@ export default function PatientAppointmentsPage() {
                     <Button variant="outline" size="xs" icon={<RefreshCw size={11} />} className="flex-1">Ertele</Button>
                   )}
                   {canCancel ? (
-                    <Button variant="ghost" size="xs" icon={<XCircle size={11} />} className="text-[var(--color-error)]">
+                    <Button variant="ghost" size="xs" icon={<XCircle size={11} />} className="text-(--color-error)">
                       İptal
                     </Button>
                   ) : (
-                    <Button variant="ghost" size="xs" className="text-[var(--color-text-muted)] text-[11px] cursor-default">
+                    <Button variant="ghost" size="xs" className="text-(--color-text-muted) text-[11px] cursor-default">
                       📞 Hastaneyi Arayın
                     </Button>
                   )}
@@ -147,7 +147,7 @@ export default function PatientAppointmentsPage() {
       {/* Floating book button */}
       <div className="sticky bottom-24 flex justify-center mt-6 px-4">
         <a href="/patient/book" id="float-book-btn" className="w-full max-w-xs">
-          <Button fullWidth size="lg" icon={<ChevronRight size={16} />} className="shadow-[var(--shadow-glow-primary)]">
+          <Button fullWidth size="lg" icon={<ChevronRight size={16} />} className="shadow-(--shadow-glow-primary)">
             Yeni Randevu Al
           </Button>
         </a>
@@ -159,8 +159,8 @@ export default function PatientAppointmentsPage() {
 
 function DetailItem({ icon, value }: { icon: React.ReactNode; value: string }) {
   return (
-    <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
-      <span className="text-[var(--color-text-muted)] shrink-0">{icon}</span>
+    <div className="flex items-center gap-1.5 text-xs text-(--color-text-muted)">
+      <span className="text-(--color-text-muted) shrink-0">{icon}</span>
       <span className="truncate">{value}</span>
     </div>
   );

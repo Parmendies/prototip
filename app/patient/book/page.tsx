@@ -7,7 +7,7 @@ import { Avatar } from '@/app/_components/ui/Avatar';
 import { mockDoctors, mockDepartments } from '@/app/_lib/mock-data';
 import { useState } from 'react';
 import {
-  Search, ChevronRight, ChevronLeft, Star,
+  ChevronRight, ChevronLeft, Star,
   Video, MapPin, Check, Clock, UploadCloud, File, Sparkles
 } from 'lucide-react';
 import { cn } from '@/app/_lib/utils';
@@ -57,39 +57,33 @@ export default function BookAppointmentPage() {
     setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
   }
 
-  const matchedDoctors = selectedTags.length > 0
-    ? mockDoctors.filter(d => {
-        const dept = mockDepartments.find(dep => dep.id === d.departmentId);
-        return dept?.tags.some(t => selectedTags.some(st => t.includes(st.toLowerCase().slice(0, 4))));
-      })
-    : mockDoctors;
 
   return (
     <div className="w-full">
                
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-[var(--color-bg-base)]/90 backdrop-blur-xl px-4 pt-4 pb-3 border-b border-[var(--color-border-subtle)]">
+      <div className="sticky top-0 z-20 bg-(--color-bg-base)/90 backdrop-blur-xl px-4 pt-4 pb-3 border-b border-(--color-border-subtle)">
         <div className="flex items-center gap-3 mb-3">
           <button
             onClick={() => step > 1 && setStep(s => s - 1)}
-            className={cn('text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors p-1 rounded-lg hover:bg-[var(--color-bg-elevated)]', step <= 1 && 'invisible')}
+            className={cn('text-(--color-text-muted) hover:text-(--color-text-primary) transition-colors p-1 rounded-lg hover:bg-(--color-bg-elevated)', step <= 1 && 'invisible')}
             aria-label="Geri"
           >
             <ChevronLeft size={20} />
           </button>
           
           <div className="flex-1 text-center">
-            <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+            <p className="text-sm font-semibold text-(--color-text-primary)">
               {['Şikayetiniz', 'Doktor Seçin', 'Tarih Seçin', 'Saat Seçin', 'Onaylayın'][step - 1]}
             </p>
-            <p className="text-[10px] text-[var(--color-text-muted)]">Adım {step} / {TOTAL_STEPS}</p>
+            <p className="text-[10px] text-(--color-text-muted)">Adım {step} / {TOTAL_STEPS}</p>
           </div>
           <div className="w-8" />
         </div>
         {/* Progress bar */}
-        <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
+        <div className="w-full h-1.5 rounded-full bg-(--color-bg-elevated)">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] transition-all duration-500"
+            className="h-full rounded-full bg-linear-to-r from-(--color-primary) to-(--color-secondary) transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -101,8 +95,8 @@ export default function BookAppointmentPage() {
         {step === 1 && (
           <div className="space-y-4 animate-slide-up">
             <div>
-              <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-1">Şikayetinizi anlatın</h2>
-              <p className="text-sm text-[var(--color-text-muted)]">AI size en uygun doktoru bulacak</p>
+              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Şikayetinizi anlatın</h2>
+              <p className="text-sm text-(--color-text-muted)">AI size en uygun doktoru bulacak</p>
             </div>
             <textarea
               id="complaint-input"
@@ -110,10 +104,10 @@ export default function BookAppointmentPage() {
               value={complaint}
               onChange={e => setComplaint(e.target.value)}
               rows={4}
-              className="w-full px-4 py-3 text-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary)] resize-none"
+              className="w-full px-4 py-3 text-sm rounded-2xl border border-(--color-border) bg-(--color-bg-surface) text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-primary) resize-none"
             />
             <div>
-              <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">Veya semptom seçin:</p>
+              <p className="text-xs font-medium text-(--color-text-secondary) mb-2">Veya semptom seçin:</p>
               <div className="flex flex-wrap gap-2">
                 {tags.map(tag => (
                   <button
@@ -123,8 +117,8 @@ export default function BookAppointmentPage() {
                     className={cn(
                       'px-3 py-1.5 rounded-full text-sm border transition-all duration-150',
                       selectedTags.includes(tag)
-                        ? 'border-[var(--color-primary)] bg-[var(--color-primary-muted)] text-[var(--color-primary)] font-medium'
-                        : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[var(--color-border)]'
+                        ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary) font-medium'
+                        : 'border-(--color-border) text-(--color-text-muted) hover:border-(--color-border)'
                     )}
                   >
                     {tag}
@@ -135,11 +129,11 @@ export default function BookAppointmentPage() {
 
             {/* Document Upload */}
             <div className="mt-4">
-              <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">Tahlil veya Görüntü Yükle (İsteğe bağlı):</p>
-              <label className="flex items-center justify-center w-full p-4 border-2 border-dashed border-[var(--color-border)] rounded-2xl cursor-pointer hover:border-[var(--color-primary)] transition-colors bg-[var(--color-bg-surface)]">
+              <p className="text-xs font-medium text-(--color-text-secondary) mb-2">Tahlil veya Görüntü Yükle (İsteğe bağlı):</p>
+              <label className="flex items-center justify-center w-full p-4 border-2 border-dashed border-(--color-border) rounded-2xl cursor-pointer hover:border-(--color-primary) transition-colors bg-(--color-bg-surface)">
                 <div className="flex flex-col items-center gap-2">
-                  <UploadCloud size={24} className="text-[var(--color-primary)]" />
-                  <span className="text-sm font-medium text-[var(--color-text-muted)]">Belge Yüklemek İçin Tıklayın</span>
+                  <UploadCloud size={24} className="text-(--color-primary)" />
+                  <span className="text-sm font-medium text-(--color-text-muted)">Belge Yüklemek İçin Tıklayın</span>
                 </div>
                 <input type="file" multiple className="hidden" onChange={handleFileUpload} />
               </label>
@@ -147,9 +141,9 @@ export default function BookAppointmentPage() {
               {uploadedDocs.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {uploadedDocs.map((doc, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-[var(--color-bg-elevated)] p-2.5 rounded-xl border border-[var(--color-border-subtle)]">
-                      <File size={16} className="text-[var(--color-secondary)]" />
-                      <span className="text-xs text-[var(--color-text-primary)] truncate flex-1">{doc}</span>
+                    <div key={i} className="flex items-center gap-2 bg-(--color-bg-elevated) p-2.5 rounded-xl border border-(--color-border-subtle)">
+                      <File size={16} className="text-(--color-secondary)" />
+                      <span className="text-xs text-(--color-text-primary) truncate flex-1">{doc}</span>
                     </div>
                   ))}
                 </div>
@@ -174,8 +168,8 @@ export default function BookAppointmentPage() {
         {step === 2 && (
           <div className="space-y-3 animate-slide-up">
             <div>
-              <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-1">Doktor Seçin</h2>
-              <p className="text-sm text-[var(--color-text-muted)]">Şikayetinize göre önerilen doktorlar</p>
+              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Doktor Seçin</h2>
+              <p className="text-sm text-(--color-text-muted)">Şikayetinize göre önerilen doktorlar</p>
             </div>
             {mockDoctors.map(doctor => {
               const dept = mockDepartments.find(d => d.id === doctor.departmentId);
@@ -188,27 +182,27 @@ export default function BookAppointmentPage() {
                   className={cn(
                     'w-full text-left p-4 rounded-2xl border transition-all duration-150',
                     isSelected
-                      ? 'border-[var(--color-primary)] bg-[var(--color-primary-muted)]'
-                      : 'border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] hover:border-[var(--color-border)]'
+                      ? 'border-(--color-primary) bg-(--color-primary-muted)'
+                      : 'border-(--color-border-subtle) bg-(--color-bg-surface) hover:border-(--color-border)'
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <Avatar firstName={doctor.firstName} lastName={doctor.lastName} size="lg" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-sm font-bold text-[var(--color-text-primary)] truncate">
+                        <p className="text-sm font-bold text-(--color-text-primary) truncate">
                           {doctor.title} {doctor.lastName}
                         </p>
-                        {isSelected && <Check size={14} className="text-[var(--color-primary)] shrink-0" />}
+                        {isSelected && <Check size={14} className="text-(--color-primary) shrink-0" />}
                       </div>
-                      <p className="text-xs text-[var(--color-text-muted)] truncate">{doctor.specialty}</p>
+                      <p className="text-xs text-(--color-text-muted) truncate">{doctor.specialty}</p>
                       <div className="flex items-center gap-3 mt-1.5">
                         <div className="flex items-center gap-0.5">
-                          <Star size={11} className="text-[var(--color-accent)] fill-[var(--color-accent)]" />
-                          <span className="text-xs font-semibold text-[var(--color-text-primary)]">{doctor.rating}</span>
-                          <span className="text-[10px] text-[var(--color-text-muted)]">({doctor.reviewCount})</span>
+                          <Star size={11} className="text-(--color-accent) fill-(--color-accent)" />
+                          <span className="text-xs font-semibold text-(--color-text-primary)">{doctor.rating}</span>
+                          <span className="text-[10px] text-(--color-text-muted)">({doctor.reviewCount})</span>
                         </div>
-                        <span className="text-[10px] text-[var(--color-text-muted)]">{doctor.experienceYears} yıl deneyim</span>
+                        <span className="text-[10px] text-(--color-text-muted)">{doctor.experienceYears} yıl deneyim</span>
                       </div>
                     </div>
                   </div>
@@ -237,8 +231,8 @@ export default function BookAppointmentPage() {
         {step === 3 && (
           <div className="space-y-4 animate-slide-up">
             <div>
-              <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-1">Tarih Seçin</h2>
-              <p className="text-sm text-[var(--color-text-muted)]">Müsait günleri görebilirsiniz</p>
+              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Tarih Seçin</h2>
+              <p className="text-sm text-(--color-text-muted)">Müsait günleri görebilirsiniz</p>
             </div>
             <div className="grid grid-cols-4 gap-2">
               {mockCalendarDays.map(({ date, slots }) => {
@@ -250,22 +244,22 @@ export default function BookAppointmentPage() {
                     className={cn(
                       'flex flex-col items-center py-3 rounded-2xl border transition-all duration-150',
                       isSelected
-                        ? 'border-[var(--color-primary)] bg-[var(--color-primary-muted)]'
-                        : 'border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] hover:border-[var(--color-border)]'
+                        ? 'border-(--color-primary) bg-(--color-primary-muted)'
+                        : 'border-(--color-border-subtle) bg-(--color-bg-surface) hover:border-(--color-border)'
                     )}
                   >
-                    <span className="text-[10px] text-[var(--color-text-muted)] uppercase">
+                    <span className="text-[10px] text-(--color-text-muted) uppercase">
                       {date.toLocaleDateString('tr-TR', { weekday: 'short' })}
                     </span>
                     <span className={cn(
                       'text-lg font-bold mt-0.5',
-                      isSelected ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-primary)]'
+                      isSelected ? 'text-(--color-primary)' : 'text-(--color-text-primary)'
                     )}>
                       {date.getDate()}
                     </span>
                     <span className={cn(
                       'text-[9px] mt-0.5',
-                      slots > 4 ? 'text-[var(--color-success)]' : slots > 1 ? 'text-[var(--color-warning)]' : 'text-[var(--color-error)]'
+                      slots > 4 ? 'text-(--color-success)' : slots > 1 ? 'text-(--color-warning)' : 'text-(--color-error)'
                     )}>
                       {slots} slot
                     </span>
@@ -283,8 +277,8 @@ export default function BookAppointmentPage() {
         {step === 4 && (
           <div className="space-y-4 animate-slide-up">
             <div>
-              <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-1">Saat Seçin</h2>
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Saat Seçin</h2>
+              <p className="text-sm text-(--color-text-muted)">
                 {selectedDay?.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })}
               </p>
             </div>
@@ -299,8 +293,8 @@ export default function BookAppointmentPage() {
                   className={cn(
                     'flex items-center gap-2 p-3 rounded-2xl border transition-all duration-150',
                     aptType === type
-                      ? 'border-[var(--color-primary)] bg-[var(--color-primary-muted)] text-[var(--color-primary)]'
-                      : 'border-[var(--color-border-subtle)] text-[var(--color-text-muted)]'
+                      ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
+                      : 'border-(--color-border-subtle) text-(--color-text-muted)'
                   )}
                 >
                   {type === 'online' ? <Video size={16} /> : <MapPin size={16} />}
@@ -322,10 +316,10 @@ export default function BookAppointmentPage() {
                     className={cn(
                       'flex items-center justify-center gap-1.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150',
                       isBooked
-                        ? 'border-[var(--color-border-subtle)] text-[var(--color-text-muted)] opacity-40 cursor-not-allowed line-through'
+                        ? 'border-(--color-border-subtle) text-(--color-text-muted) opacity-40 cursor-not-allowed line-through'
                         : isSelected
-                        ? 'border-[var(--color-primary)] bg-[var(--color-primary-muted)] text-[var(--color-primary)]'
-                        : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
+                        ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
+                        : 'border-(--color-border) text-(--color-text-secondary) hover:border-(--color-primary) hover:text-(--color-primary)'
                     )}
                   >
                     <Clock size={12} />
@@ -344,18 +338,18 @@ export default function BookAppointmentPage() {
         {step === 5 && selectedDoctor && selectedDay && selectedSlot && (
           <div className="space-y-4 animate-slide-up">
             <div>
-              <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-1">Randevu Özeti</h2>
-              <p className="text-sm text-[var(--color-text-muted)]">Onaylamadan önce kontrol edin</p>
+              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Randevu Özeti</h2>
+              <p className="text-sm text-(--color-text-muted)">Onaylamadan önce kontrol edin</p>
             </div>
 
             <Card>
               <div className="flex items-center gap-3 mb-4">
                 <Avatar firstName={selectedDoctor.firstName} lastName={selectedDoctor.lastName} size="lg" />
                 <div>
-                  <p className="font-bold text-[var(--color-text-primary)]">
+                  <p className="font-bold text-(--color-text-primary)">
                     {selectedDoctor.title} {selectedDoctor.firstName} {selectedDoctor.lastName}
                   </p>
-                  <p className="text-sm text-[var(--color-text-muted)]">{selectedDoctor.specialty}</p>
+                  <p className="text-sm text-(--color-text-muted)">{selectedDoctor.specialty}</p>
                 </div>
               </div>
               <div className="space-y-3 pt-3 divider">
@@ -366,23 +360,23 @@ export default function BookAppointmentPage() {
               </div>
               
               {aiReport && (
-                <div className="mt-4 p-3 bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secondary)]/10 rounded-xl border border-[var(--color-primary)]/20">
+                <div className="mt-4 p-3 bg-linear-to-br from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Sparkles size={14} className="text-[var(--color-primary)]" />
-                    <span className="text-xs font-bold text-[var(--color-primary)]">AI Ön Analiz Raporu</span>
+                    <Sparkles size={14} className="text-(--color-primary)" />
+                    <span className="text-xs font-bold text-(--color-primary)">AI Ön Analiz Raporu</span>
                   </div>
-                  <p className="text-xs text-[var(--color-text-primary)] leading-relaxed italic">&quot;{aiReport}&quot;</p>
+                  <p className="text-xs text-(--color-text-primary) leading-relaxed italic">&quot;{aiReport}&quot;</p>
                   {uploadedDocs.length > 0 && (
-                    <p className="text-xs text-[var(--color-text-muted)] mt-2 mt-2 font-medium">({uploadedDocs.length} belge eklendi)</p>
+                    <p className="text-xs text-(--color-text-muted) mt-2 font-medium">({uploadedDocs.length} belge eklendi)</p>
                   )}
                 </div>
               )}
             </Card>
 
             {/* Policy note */}
-            <div className="rounded-2xl bg-[var(--color-warning-muted)] border border-[var(--color-warning)]/20 p-3">
-              <p className="text-xs text-[var(--color-warning)] font-medium mb-1">⚠️ İptal Politikası</p>
-              <p className="text-xs text-[var(--color-text-muted)]">
+            <div className="rounded-2xl bg-(--color-warning-muted) border border-warning/20 p-3">
+              <p className="text-xs text-(--color-warning) font-medium mb-1">⚠️ İptal Politikası</p>
+              <p className="text-xs text-(--color-text-muted)">
                 Randevunuzu, başlangıçtan 24 saat önceye kadar ücretsiz iptal edebilirsiniz.
                 Erteleme için 12 saat kural geçerlidir.
               </p>
@@ -407,8 +401,8 @@ export default function BookAppointmentPage() {
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-start gap-3">
-      <span className="text-sm text-[var(--color-text-muted)] shrink-0">{label}</span>
-      <span className="text-sm text-[var(--color-text-primary)] text-right">{value}</span>
+      <span className="text-sm text-(--color-text-muted) shrink-0">{label}</span>
+      <span className="text-sm text-(--color-text-primary) text-right">{value}</span>
     </div>
   );
 }

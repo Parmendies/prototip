@@ -29,30 +29,30 @@ export function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-[var(--color-text-secondary)]"
+          className="text-sm font-medium text-(--color-text-secondary)"
         >
           {label}
           {props.required && (
-            <span className="ml-1 text-[var(--color-error)]">*</span>
+            <span className="ml-1 text-(--color-error)">*</span>
           )}
         </label>
       )}
       <div className="relative flex items-center">
         {prefix && (
-          <span className="absolute left-3 text-[var(--color-text-muted)] flex items-center">
+          <span className="absolute left-3 text-(--color-text-muted) flex items-center">
             {prefix}
           </span>
         )}
         <input
           id={inputId}
           className={cn(
-            'w-full rounded-xl border bg-[var(--color-bg-elevated)] px-3.5 py-2.5',
-            'text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]',
-            'border-[var(--color-border)] transition-all duration-150',
-            'focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]',
-            'hover:border-[var(--color-bg-overlay)]',
+            'w-full rounded-xl border bg-(--color-bg-elevated) px-3.5 py-2.5',
+            'text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted)',
+            'border-(--color-border) transition-all duration-150',
+            'focus:outline-none focus:border-(--color-primary) focus:ring-1 focus:ring-(--color-primary)',
+            'hover:border-(--color-bg-overlay)',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            error && 'border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]',
+            error && 'border-(--color-error) focus:border-(--color-error) focus:ring-(--color-error)',
             prefix && 'pl-10',
             suffix && 'pr-10',
             className
@@ -60,16 +60,16 @@ export function Input({
           {...props}
         />
         {suffix && (
-          <span className="absolute right-3 text-[var(--color-text-muted)] flex items-center">
+          <span className="absolute right-3 text-(--color-text-muted) flex items-center">
             {suffix}
           </span>
         )}
       </div>
       {error && (
-        <p className="text-xs text-[var(--color-error)]">{error}</p>
+        <p className="text-xs text-(--color-error)">{error}</p>
       )}
       {hint && !error && (
-        <p className="text-xs text-[var(--color-text-muted)]">{hint}</p>
+        <p className="text-xs text-(--color-text-muted)">{hint}</p>
       )}
     </div>
   );
@@ -90,31 +90,31 @@ export function Textarea({ label, error, hint, className, id, ...props }: Textar
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-[var(--color-text-secondary)]"
+          className="text-sm font-medium text-(--color-text-secondary)"
         >
           {label}
           {props.required && (
-            <span className="ml-1 text-[var(--color-error)]">*</span>
+            <span className="ml-1 text-(--color-error)">*</span>
           )}
         </label>
       )}
       <textarea
         id={inputId}
         className={cn(
-          'w-full rounded-xl border bg-[var(--color-bg-elevated)] px-3.5 py-2.5',
-          'text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]',
-          'border-[var(--color-border)] transition-all duration-150 resize-none',
-          'focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]',
-          'hover:border-[var(--color-bg-overlay)]',
+          'w-full rounded-xl border bg-(--color-bg-elevated) px-3.5 py-2.5',
+          'text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted)',
+          'border-(--color-border) transition-all duration-150 resize-none',
+          'focus:outline-none focus:border-(--color-primary) focus:ring-1 focus:ring-(--color-primary)',
+          'hover:border-(--color-bg-overlay)',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          error && 'border-[var(--color-error)]',
+          error && 'border-(--color-error)',
           className
         )}
         rows={props.rows ?? 4}
         {...props}
       />
-      {error && <p className="text-xs text-[var(--color-error)]">{error}</p>}
-      {hint && !error && <p className="text-xs text-[var(--color-text-muted)]">{hint}</p>}
+      {error && <p className="text-xs text-(--color-error)">{error}</p>}
+      {hint && !error && <p className="text-xs text-(--color-text-muted)">{hint}</p>}
     </div>
   );
 }

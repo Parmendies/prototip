@@ -55,8 +55,8 @@ export default function DepartmentsPage() {
         {/* Top bar */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-sm text-[var(--color-text-muted)]">
-              Toplam <span className="font-semibold text-[var(--color-text-primary)]">{departments.length}</span> departman
+            <p className="text-sm text-(--color-text-muted)">
+              Toplam <span className="font-semibold text-(--color-text-primary)">{departments.length}</span> departman
             </p>
           </div>
           <Button id="add-department-btn" onClick={openAdd} icon={<Plus size={14} />}>
@@ -77,24 +77,24 @@ export default function DepartmentsPage() {
                     {dep.icon}
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{dep.name}</h3>
+                    <h3 className="text-sm font-semibold text-(--color-text-primary)">{dep.name}</h3>
                     <div className="flex items-center gap-1 mt-0.5">
-                      <Users size={11} className="text-[var(--color-text-muted)]" />
-                      <span className="text-[11px] text-[var(--color-text-muted)]">{dep.doctorCount} doktor</span>
+                      <Users size={11} className="text-(--color-text-muted)" />
+                      <span className="text-[11px] text-(--color-text-muted)">{dep.doctorCount} doktor</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => openEdit(dep)}
-                    className="p-1.5 rounded-lg hover:bg-[var(--color-bg-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-(--color-bg-elevated) text-(--color-text-muted) hover:text-(--color-primary) transition-colors"
                     aria-label="Düzenle"
                   >
                     <Pencil size={13} />
                   </button>
                   <button
                     onClick={() => handleDelete(dep.id)}
-                    className="p-1.5 rounded-lg hover:bg-[var(--color-error-muted)] text-[var(--color-text-muted)] hover:text-[var(--color-error)] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-(--color-error-muted) text-(--color-text-muted) hover:text-(--color-error) transition-colors"
                     aria-label="Sil"
                   >
                     <Trash2 size={13} />
@@ -103,7 +103,7 @@ export default function DepartmentsPage() {
               </div>
 
               {dep.description && (
-                <p className="text-xs text-[var(--color-text-muted)] mb-3 leading-relaxed line-clamp-2">
+                <p className="text-xs text-(--color-text-muted) mb-3 leading-relaxed line-clamp-2">
                   {dep.description}
                 </p>
               )}
@@ -120,7 +120,7 @@ export default function DepartmentsPage() {
                   </span>
                 ))}
                 {dep.tags.length > 4 && (
-                  <span className="text-[10px] text-[var(--color-text-muted)]">+{dep.tags.length - 4}</span>
+                  <span className="text-[10px] text-(--color-text-muted)">+{dep.tags.length - 4}</span>
                 )}
               </div>
 
@@ -137,12 +137,12 @@ export default function DepartmentsPage() {
           <button
             id="add-department-card"
             onClick={openAdd}
-            className="rounded-2xl border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-muted)] p-6 flex flex-col items-center justify-center gap-2 transition-all duration-200 group min-h-[160px]"
+            className="rounded-2xl border-2 border-dashed border-(--color-border) hover:border-(--color-primary) hover:bg-(--color-primary-muted) p-6 flex flex-col items-center justify-center gap-2 transition-all duration-200 group min-h-[160px]"
           >
-            <div className="w-10 h-10 rounded-xl bg-[var(--color-bg-elevated)] group-hover:bg-[var(--color-primary)] group-hover:text-[hsl(222,47%,7%)] flex items-center justify-center text-[var(--color-text-muted)] transition-all">
+            <div className="w-10 h-10 rounded-xl bg-(--color-bg-elevated) group-hover:bg-(--color-primary) group-hover:text-[hsl(222,47%,7%)] flex items-center justify-center text-(--color-text-muted) transition-all">
               <Plus size={20} />
             </div>
-            <p className="text-sm text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)] font-medium transition-colors">
+            <p className="text-sm text-(--color-text-muted) group-hover:text-(--color-primary) font-medium transition-colors">
               Yeni Departman
             </p>
           </button>
@@ -170,7 +170,7 @@ export default function DepartmentsPage() {
 
           {/* Tags */}
           <div>
-            <label className="text-sm font-medium text-[var(--color-text-secondary)]">Tıbbi Etiketler</label>
+            <label className="text-sm font-medium text-(--color-text-secondary)">Tıbbi Etiketler</label>
             <div className="flex gap-2 mt-1.5">
               <Input
                 id="dept-tag-input"
@@ -186,7 +186,7 @@ export default function DepartmentsPage() {
                 {tags.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-[var(--color-primary-muted)] text-[var(--color-primary)] cursor-pointer hover:bg-[var(--color-error-muted)] hover:text-[var(--color-error)] transition-colors"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-(--color-primary-muted) text-(--color-primary) cursor-pointer hover:bg-(--color-error-muted) hover:text-(--color-error) transition-colors"
                     onClick={() => removeTag(t)}
                     title="Kaldırmak için tıkla"
                   >
@@ -199,7 +199,7 @@ export default function DepartmentsPage() {
 
           {/* Color */}
           <div>
-            <label className="text-sm font-medium text-[var(--color-text-secondary)]">Renk</label>
+            <label className="text-sm font-medium text-(--color-text-secondary)">Renk</label>
             <div className="flex gap-2 mt-1.5">
               {['#ef4444','#8b5cf6','#f59e0b','#10b981','#6366f1','#f97316','#14b8a6','#ec4899'].map((c) => (
                 <button

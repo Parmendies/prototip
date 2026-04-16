@@ -1,12 +1,11 @@
 import AdminHeader from '../_components/AdminHeader';
 import { Card, CardHeader } from '@/app/_components/ui/Card';
 import { Badge } from '@/app/_components/ui/Badge';
-import { mockDashboardStats, mockDepartments, mockAppointments, mockDoctors } from '@/app/_lib/mock-data';
-import { formatRelativeTime } from '@/app/_lib/utils';
+import { mockDashboardStats, mockAppointments, mockDoctors } from '@/app/_lib/mock-data';
 import type { Metadata } from 'next';
 import {
   TrendingUp, Users, Calendar, Activity,
-  Share2, Clock, CheckCircle, XCircle,
+  Share2, Clock, 
 } from 'lucide-react';
 
 export const metadata: Metadata = { title: 'Dashboard' };
@@ -57,9 +56,9 @@ const statCards = [
 ];
 
 const activityIcons: Record<string, React.ReactNode> = {
-  new_patient: <Users size={14} className="text-[var(--color-success)]" />,
-  appointment:  <Calendar size={14} className="text-[var(--color-primary)]" />,
-  staff:        <Activity size={14} className="text-[var(--color-secondary)]" />,
+  new_patient: <Users size={14} className="text-(--color-success)" />,
+  appointment:  <Calendar size={14} className="text-(--color-primary)" />,
+  staff:        <Activity size={14} className="text-(--color-secondary)" />,
 };
 
 export default function AdminDashboardPage() {
@@ -85,13 +84,13 @@ export default function AdminDashboardPage() {
                   <span style={{ color: card.color }}>{card.icon}</span>
                 </div>
                 <span
-                  className={`text-xs font-medium px-1.5 py-0.5 rounded-md ${card.positive ? 'text-[var(--color-success)] bg-[var(--color-success-muted)]' : 'text-[var(--color-error)] bg-[var(--color-error-muted)]'}`}
+                  className={`text-xs font-medium px-1.5 py-0.5 rounded-md ${card.positive ? 'text-(--color-success) bg-(--color-success-muted)' : 'text-(--color-error) bg-(--color-error-muted)'}`}
                 >
                   {card.change}
                 </span>
               </div>
-              <p className="text-2xl font-bold text-[var(--color-text-primary)] mb-0.5">{card.value}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">{card.title}</p>
+              <p className="text-2xl font-bold text-(--color-text-primary) mb-0.5">{card.value}</p>
+              <p className="text-xs text-(--color-text-muted)">{card.title}</p>
             </Card>
           ))}
         </div>
@@ -107,7 +106,7 @@ export default function AdminDashboardPage() {
                 const isToday = day.day === 'Çar';
                 return (
                   <div key={day.day} className="flex-1 flex flex-col items-center gap-1.5">
-                    <span className="text-[10px] text-[var(--color-text-muted)]">{day.count}</span>
+                    <span className="text-[10px] text-(--color-text-muted)">{day.count}</span>
                     <div className="w-full rounded-t-md transition-all duration-500 relative overflow-hidden"
                       style={{
                         height: `${height}%`,
@@ -121,7 +120,7 @@ export default function AdminDashboardPage() {
                         <div className="absolute inset-0 animate-pulse-glow rounded-t-md" />
                       )}
                     </div>
-                    <span className={`text-[10px] font-medium ${isToday ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'}`}>
+                    <span className={`text-[10px] font-medium ${isToday ? 'text-(--color-primary)' : 'text-(--color-text-muted)'}`}>
                       {day.day}
                     </span>
                   </div>
@@ -139,29 +138,29 @@ export default function AdminDashboardPage() {
             />
             <div className="mt-4 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-[var(--color-text-muted)]">Instagram</span>
-                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{socialMediaLeads.instagram}</span>
+                <span className="text-xs text-(--color-text-muted)">Instagram</span>
+                <span className="text-sm font-semibold text-(--color-text-primary)">{socialMediaLeads.instagram}</span>
               </div>
-              <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
+              <div className="w-full h-1.5 rounded-full bg-(--color-bg-elevated)">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#e1306c] to-[#833ab4] transition-all"
+                  className="h-full rounded-full bg-linear-to-r from-[#e1306c] to-[#833ab4] transition-all"
                   style={{ width: `${(socialMediaLeads.instagram / socialMediaLeads.total) * 100}%` }}
                 />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-[var(--color-text-muted)]">Telegram</span>
-                <span className="text-sm font-semibold text-[var(--color-text-primary)]">{socialMediaLeads.telegram}</span>
+                <span className="text-xs text-(--color-text-muted)">Telegram</span>
+                <span className="text-sm font-semibold text-(--color-text-primary)">{socialMediaLeads.telegram}</span>
               </div>
-              <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
+              <div className="w-full h-1.5 rounded-full bg-(--color-bg-elevated)">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#1877f2] to-[#0866ff] transition-all"
+                  className="h-full rounded-full bg-linear-to-r from-[#1877f2] to-[#0866ff] transition-all"
                   style={{ width: `${(socialMediaLeads.telegram / socialMediaLeads.total) * 100}%` }}
                 />
               </div>
               <div className="pt-2 divider">
                 <div className="pt-2 flex items-center justify-between">
-                  <span className="text-xs text-[var(--color-text-muted)]">Dönüşüm</span>
-                  <span className="text-sm font-bold text-[var(--color-success)]">%{socialMediaLeads.conversionRate}</span>
+                  <span className="text-xs text-(--color-text-muted)">Dönüşüm</span>
+                  <span className="text-sm font-bold text-(--color-success)">%{socialMediaLeads.conversionRate}</span>
                 </div>
               </div>
             </div>
@@ -177,10 +176,10 @@ export default function AdminDashboardPage() {
               {topDepartments.map((dept, i) => (
                 <div key={dept.name}>
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-[var(--color-text-secondary)]">{dept.name}</span>
-                    <span className="text-xs text-[var(--color-text-muted)]">%{dept.percentage}</span>
+                    <span className="text-xs text-(--color-text-secondary)">{dept.name}</span>
+                    <span className="text-xs text-(--color-text-muted)">%{dept.percentage}</span>
                   </div>
-                  <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
+                  <div className="w-full h-1.5 rounded-full bg-(--color-bg-elevated)">
                     <div
                       className="h-full rounded-full transition-all duration-700"
                       style={{
@@ -199,14 +198,14 @@ export default function AdminDashboardPage() {
             <CardHeader title="Son Aktiviteler" subtitle="Gerçek zamanlı" icon={<Clock size={14} />} />
             <div className="mt-4 space-y-3">
               {recentActivity.map((item) => (
-                <div key={item.id} className="flex items-start gap-3 py-2 border-b border-[var(--color-border-subtle)] last:border-0">
-                  <div className="w-6 h-6 rounded-full bg-[var(--color-bg-elevated)] flex items-center justify-center shrink-0 mt-0.5">
+                <div key={item.id} className="flex items-start gap-3 py-2 border-b border-(--color-border-subtle) last:border-0">
+                  <div className="w-6 h-6 rounded-full bg-(--color-bg-elevated) flex items-center justify-center shrink-0 mt-0.5">
                     {activityIcons[item.type]}
                   </div>
-                  <p className="text-sm text-[var(--color-text-secondary)] flex-1 leading-relaxed">
+                  <p className="text-sm text-(--color-text-secondary) flex-1 leading-relaxed">
                     {item.message}
                   </p>
-                  <span className="text-[11px] text-[var(--color-text-muted)] shrink-0 pt-0.5">{item.time}</span>
+                  <span className="text-[11px] text-(--color-text-muted) shrink-0 pt-0.5">{item.time}</span>
                 </div>
               ))}
             </div>
@@ -223,24 +222,24 @@ export default function AdminDashboardPage() {
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left border-b border-[var(--color-border-subtle)]">
+                <tr className="text-left border-b border-(--color-border-subtle)">
                   {['Hasta', 'Doktor', 'Saat', 'Tür', 'Durum'].map((h) => (
-                    <th key={h} className="pb-2 pr-4 text-xs font-medium text-[var(--color-text-muted)] whitespace-nowrap">{h}</th>
+                    <th key={h} className="pb-2 pr-4 text-xs font-medium text-(--color-text-muted) whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-border-subtle)]">
+              <tbody className="divide-y divide-(--color-border-subtle)">
                 {mockAppointments.filter(a => a.date === '2026-04-16').slice(0, 5).map((apt) => {
                   const doctor = mockDoctors.find(d => d.id === apt.doctorId);
                   return (
-                    <tr key={apt.id} className="hover:bg-[var(--color-bg-elevated)] transition-colors">
-                      <td className="py-2.5 pr-4 text-[var(--color-text-secondary)] whitespace-nowrap">
+                    <tr key={apt.id} className="hover:bg-(--color-bg-elevated) transition-colors">
+                      <td className="py-2.5 pr-4 text-(--color-text-secondary) whitespace-nowrap">
                         Hasta {apt.patientId.replace('pat-', '#')}
                       </td>
-                      <td className="py-2.5 pr-4 font-medium text-[var(--color-text-primary)] whitespace-nowrap">
+                      <td className="py-2.5 pr-4 font-medium text-(--color-text-primary) whitespace-nowrap">
                         {doctor ? `${doctor.title} ${doctor.lastName}` : '-'}
                       </td>
-                      <td className="py-2.5 pr-4 text-[var(--color-text-muted)] whitespace-nowrap font-mono text-xs">
+                      <td className="py-2.5 pr-4 text-(--color-text-muted) whitespace-nowrap font-mono text-xs">
                         {apt.startTime}
                       </td>
                       <td className="py-2.5 pr-4 whitespace-nowrap">

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function DoctorLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--color-bg-base)]">
+    <div className="flex h-screen overflow-hidden bg-(--color-bg-base)">
       <DoctorSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         {children}

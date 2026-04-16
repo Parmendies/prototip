@@ -29,7 +29,7 @@ export function Card({
         'rounded-2xl border',
         glass
           ? 'glass'
-          : 'bg-[var(--color-bg-surface)] border-[var(--color-border-subtle)]',
+          : 'bg-(--color-bg-surface) border-(--color-border-subtle)',
         hover && 'card-hover cursor-pointer',
         paddingStyles[padding],
         className
@@ -55,16 +55,16 @@ export function CardHeader({ title, subtitle, action, icon, className }: CardHea
     <div className={cn('flex items-start justify-between gap-3', className)}>
       <div className="flex items-center gap-3 min-w-0">
         {icon && (
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--color-primary-muted)] text-[var(--color-primary)] shrink-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-(--color-primary-muted) text-(--color-primary)nk-0">
             {icon}
           </div>
         )}
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
+          <h3 className="text-sm font-semibold text-(--color-text-primary)cate">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-xs text-[var(--color-text-muted)] mt-0.5 truncate">
+            <p className="text-xs text-(--color-text-muted) mt-0.5 truncate">
               {subtitle}
             </p>
           )}
