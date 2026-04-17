@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/app/_lib/utils';
 import { TIME_SLOTS } from '@/app/_lib/constants';
+import { generateMedicalReport } from './actions';
 
 const TOTAL_STEPS = 5;
 
@@ -23,34 +24,53 @@ const mockCalendarDays = Array.from({ length: 14 }, (_, i) => {
 });
 
 export default function BookAppointmentPage() {
-  const [step, setStep]               = useState(1);
-  const [complaint, setComplaint]     = useState('');
+  const [step, setStep] = useState(1);
+  const [complaint, setComplaint] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<typeof mockDoctors[0] | null>(null);
-  const [selectedDay, setSelectedDay]   = useState<Date | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [aptType, setAptType]           = useState<'face_to_face' | 'online'>('face_to_face');
-  const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
+  const [aptType, setAptType] = useState<'face_to_face' | 'online'>('face_to_face');
+  const [uploadedDocs, setUploadedDocs] = useState<File[]>([]);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
+  const [recommendedDoctorId, setRecommendedDoctorId] = useState<string | null>(null);
 
   const progress = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
-      const fileNames = Array.from(e.target.files).map(f => f.name);
-      setUploadedDocs(prev => [...prev, ...fileNames]);
+      setUploadedDocs(prev => [...prev, ...Array.from(e.target.files as FileList)]);
     }
   }
 
-  function handleNextStep1() {
+  async function handleNextStep1() {
     setIsAiGenerating(true);
-    // Simulate AI generation wait
-    setTimeout(() => {
-      setAiReport('Yapay zeka ön analizi: Hastanın belirtmiş olduğu şikayetler ve eklediği belgeler, ilgili uzman tarafından incelenmesi gereken akut bir tabloya işaret edebilir. Öncelikli olarak muayene önerilir.');
-      setIsAiGenerating(false);
+    try {
+      const formData = new FormData();
+      formData.append('complaint', complaint);
+      formData.append('selectedTags', JSON.stringify(selectedTags));
+
+      uploadedDocs.forEach(doc => {
+        formData.append('files', doc);
+      });
+
+      const aiData = await generateMedicalReport(formData);
+      setAiReport(aiData.report);
+
+      if (aiData.recommendedDoctorId) {
+        setRecommendedDoctorId(aiData.recommendedDoctorId);
+        const doc = mockDoctors.find(d => d.id === aiData.recommendedDoctorId);
+        if (doc) setSelectedDoctor(doc);
+      }
+
       setStep(2);
-    }, 1500);
+    } catch (error: any) {
+      console.error(error);
+      alert("AI analizi sırasında bir hata oluştu: " + error.message);
+    } finally {
+      setIsAiGenerating(false);
+    }
   }
 
   function toggleTag(tag: string) {
@@ -60,7 +80,7 @@ export default function BookAppointmentPage() {
 
   return (
     <div className="w-full">
-               
+      <div className="w-150" />
       {/* Header */}
       <div className="sticky top-0 z-20 bg-(--color-bg-base)/90 backdrop-blur-xl px-4 pt-4 pb-3 border-b border-(--color-border-subtle)">
         <div className="flex items-center gap-3 mb-3">
@@ -71,7 +91,7 @@ export default function BookAppointmentPage() {
           >
             <ChevronLeft size={20} />
           </button>
-          
+
           <div className="flex-1 text-center">
             <p className="text-sm font-semibold text-(--color-text-primary)">
               {['Şikayetiniz', 'Doktor Seçin', 'Tarih Seçin', 'Saat Seçin', 'Onaylayın'][step - 1]}
@@ -135,7 +155,7 @@ export default function BookAppointmentPage() {
                   <UploadCloud size={24} className="text-(--color-primary)" />
                   <span className="text-sm font-medium text-(--color-text-muted)">Belge Yüklemek İçin Tıklayın</span>
                 </div>
-                <input type="file" multiple className="hidden" onChange={handleFileUpload} />
+                <input type="file" multiple accept=".pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileUpload} />
               </label>
 
               {uploadedDocs.length > 0 && (
@@ -143,7 +163,7 @@ export default function BookAppointmentPage() {
                   {uploadedDocs.map((doc, i) => (
                     <div key={i} className="flex items-center gap-2 bg-(--color-bg-elevated) p-2.5 rounded-xl border border-(--color-border-subtle)">
                       <File size={16} className="text-(--color-secondary)" />
-                      <span className="text-xs text-(--color-text-primary) truncate flex-1">{doc}</span>
+                      <span className="text-xs text-(--color-text-primary) truncate flex-1">{doc.name}</span>
                     </div>
                   ))}
                 </div>
@@ -171,9 +191,11 @@ export default function BookAppointmentPage() {
               <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Doktor Seçin</h2>
               <p className="text-sm text-(--color-text-muted)">Şikayetinize göre önerilen doktorlar</p>
             </div>
-            {mockDoctors.map(doctor => {
+            {mockDoctors.map((doctor) => {
               const dept = mockDepartments.find(d => d.id === doctor.departmentId);
               const isSelected = selectedDoctor?.id === doctor.id;
+              const isAiRecommended = recommendedDoctorId === doctor.id;
+
               return (
                 <button
                   key={doctor.id}
@@ -189,11 +211,16 @@ export default function BookAppointmentPage() {
                   <div className="flex items-center gap-3">
                     <Avatar firstName={doctor.firstName} lastName={doctor.lastName} size="lg" />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="text-sm font-bold text-(--color-text-primary) truncate">
                           {doctor.title} {doctor.lastName}
                         </p>
-                        {isSelected && <Check size={14} className="text-(--color-primary) shrink-0" />}
+                        {isAiRecommended && (
+                          <span className="flex items-center text-[10px] font-bold bg-(--color-primary-muted) text-(--color-primary) px-1.5 py-0.5 rounded-md gap-0.5 border border-(--color-primary)/20">
+                            <Sparkles size={10} /> AI Önerisi
+                          </span>
+                        )}
+                        {isSelected && <Check size={14} className="text-(--color-primary) shrink-0 ml-auto" />}
                       </div>
                       <p className="text-xs text-(--color-text-muted) truncate">{doctor.specialty}</p>
                       <div className="flex items-center gap-3 mt-1.5">
@@ -318,8 +345,8 @@ export default function BookAppointmentPage() {
                       isBooked
                         ? 'border-(--color-border-subtle) text-(--color-text-muted) opacity-40 cursor-not-allowed line-through'
                         : isSelected
-                        ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
-                        : 'border-(--color-border) text-(--color-text-secondary) hover:border-(--color-primary) hover:text-(--color-primary)'
+                          ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
+                          : 'border-(--color-border) text-(--color-text-secondary) hover:border-(--color-primary) hover:text-(--color-primary)'
                     )}
                   >
                     <Clock size={12} />
@@ -358,7 +385,7 @@ export default function BookAppointmentPage() {
                 <SummaryRow label="Tür" value={aptType === 'online' ? '🎥 Online (Zoom)' : '🏥 Yüz Yüze'} />
                 {complaint && <SummaryRow label="Şikayet" value={complaint.slice(0, 80) + (complaint.length > 80 ? '...' : '')} />}
               </div>
-              
+
               {aiReport && (
                 <div className="mt-4 p-3 bg-linear-to-br from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
                   <div className="flex items-center gap-1.5 mb-2">
