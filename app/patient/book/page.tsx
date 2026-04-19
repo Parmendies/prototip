@@ -55,7 +55,13 @@ export default function BookAppointmentPage() {
         formData.append('files', doc);
       });
 
-      const aiData = await generateMedicalReport(formData);
+      const response = await generateMedicalReport(formData);
+      
+      if (!response.success) {
+        throw new Error(response.error);
+      }
+
+      const aiData = response.data;
       setAiReport(aiData.report);
 
       if (aiData.recommendedDoctorId) {
