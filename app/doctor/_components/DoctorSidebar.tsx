@@ -54,7 +54,7 @@ export default function DoctorSidebar() {
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
                 isActive
-                  ? 'bg-(--color-secondary-muted) text-(--color-secondary)'
+                  ? 'bg-(--color-primary) text-white shadow-md font-semibold'
                   : 'text-(--color-text-muted) hover:bg-(--color-bg-elevated) hover:text-(--color-text-secondary)'
               )}
             >

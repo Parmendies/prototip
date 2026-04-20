@@ -59,7 +59,7 @@ export function Tabs({
                 'px-4 py-2 rounded-full',
                 isActive
                   ? 'bg-(--color-primary) text-white font-semibold shadow-[0_0_12px_hsl(172_66%_50%/0.3)]'
-                  : 'text-white/80 hover:text-white',
+                  : 'text-(--color-text-primary) hover:text-black',
               ],
               variant === 'underline' && [
                 'px-4 py-2.5 border-b-2 -mb-px rounded-none',
@@ -76,7 +76,7 @@ export function Tabs({
                 'flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold',
                 isActive
                   ? 'bg-white text-(--color-primary)'
-                  : 'bg-(--color-bg-elevated) text-white/80'
+                  : 'bg-[var(--color-bg-elevated)] text-(--color-text-primary)'
               )}>
                 {tab.badge}
               </span>
