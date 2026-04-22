@@ -1,7 +1,7 @@
 'use server';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { mockDoctors } from '@/app/_lib/mock-data';
+import { mockDoctors, mockDepartments } from '@/app/_lib/mock-data';
 
 // Bekleme yardımcısı
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -75,6 +75,14 @@ export async function generateMedicalReport(formData: FormData) {
     const selectedTags = selectedTagsStr ? JSON.parse(selectedTagsStr) : [];
     const files = formData.getAll('files') as File[];
 
+    // En azından şikayet, semptom veya dosya olmalı
+    if (complaint.trim() === '' && selectedTags.length === 0 && files.length === 0) {
+      return {
+        success: false,
+        error: 'Lütfen şikayetinizi yazın, semptom seçin veya tıbbi belge yükleyin.',
+      };
+    }
+
     let totalSize = 0;
     for (const file of files) totalSize += file.size;
 
@@ -89,12 +97,23 @@ export async function generateMedicalReport(formData: FormData) {
     const doctorsList = mockDoctors
       .map(
         (d) =>
-          `- ID: ${d.id} | ${d.title} ${d.firstName} ${d.lastName} | Uzmanlık: ${d.specialty}`
+          `- ID: ${d.id} | ${d.title} ${d.firstName} ${d.lastName} | Uzmanlık: ${d.specialty} | Departman: ${d.departmentId}`
       )
       .join('\n');
 
-    let prompt = `Sen deneyimli bir tıbbi triyaj asistanısın. Hastanın şikayeti: "${complaint}". Belirttiği semptomlar: "${selectedTags.join(', ')}". `;
+    const departmentsList = mockDepartments
+      .map(
+        (d) =>
+          `- ID: ${d.id} | ${d.name} | Açıklama: ${d.description} | Etiketler: ${d.tags.join(', ')}`
+      )
+      .join('\n');
 
+    let prompt = `Sen deneyimli bir tıbbi triyaj asistanısın. `;
+    
+    if (complaint.trim() || selectedTags.length > 0) {
+      prompt += `Hastanın şikayeti: "${complaint || 'Belirtilmemiş'}". Belirttiği semptomlar: "${selectedTags.join(', ') || 'Belirtilmemiş'}". `;
+    }
+    
     if (files.length > 0) {
       prompt += `Ayrıca hastanın yüklediği tıbbi belgeleri de incele. `;
     }
@@ -103,11 +122,18 @@ export async function generateMedicalReport(formData: FormData) {
 Hastanemizdeki mevcut doktorlar şunlardır:
 ${doctorsList}
 
+Hastanemizdeki mevcut departmanlar şunlardır:
+${departmentsList}
+
 Lütfen bu bilgilere göre tıbbi bir ön değerlendirme (aciliyet durumu dahil) yap ve hastanın hangi doktora görünmesi gerektiğine karar ver. 
+
+ÖNEMLİ: Eğer mevcut doktorlar arasında hastanın vakasıyla doğrudan ilgilenebilecek uygun bir doktor YOKSA, "recommendedDoctorId" alanını null yap ve bunun yerine "recommendedDepartment" alanına uygun departman adını belirt.
+
 Yanıtını SADECE aşağıdaki JSON formatında, tırnak işaretlerine vb. dikkat ederek temiz bir JSON olarak ver:
 {
   "report": "Maksimum 3-4 cümlelik, profesyonel ama anlaşılır dille yazılmış tıbbi ön değerlendirme analizi.",
-  "recommendedDoctorId": "Yukarıdaki listeden uygun gördüğün doktorun ID'si (örneğin dr-1)"
+  "recommendedDoctorId": "Mevcut doktorlar arasından uygun olanın ID'si (örneğin doc-1), veya uygun doktor yoksa null",
+  "recommendedDepartment": "Uygun doktor bulunamadığında, hastanın vakasıyla doğrudan ilgilenmesi gereken departman adı (örneğin Nefroloji). Uygun doktor varsa null."
 }`;
 
     const genAI = new GoogleGenerativeAI(apiKey);

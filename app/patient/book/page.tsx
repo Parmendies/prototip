@@ -35,6 +35,7 @@ export default function BookAppointmentPage() {
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [recommendedDoctorId, setRecommendedDoctorId] = useState<string | null>(null);
+  const [recommendedDepartment, setRecommendedDepartment] = useState<string | null>(null);
 
   const progress = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
 
@@ -68,6 +69,10 @@ export default function BookAppointmentPage() {
         setRecommendedDoctorId(aiData.recommendedDoctorId);
         const doc = mockDoctors.find(d => d.id === aiData.recommendedDoctorId);
         if (doc) setSelectedDoctor(doc);
+      }
+
+      if (aiData.recommendedDepartment) {
+        setRecommendedDepartment(aiData.recommendedDepartment);
       }
 
       setStep(2);
@@ -180,7 +185,7 @@ export default function BookAppointmentPage() {
               id="step1-next"
               fullWidth
               onClick={handleNextStep1}
-              disabled={(!complaint.trim() && selectedTags.length === 0) || isAiGenerating}
+              disabled={isAiGenerating}
               iconRight={isAiGenerating ? undefined : <Sparkles size={16} />}
               size="lg"
               className="mt-4 gap-2"
@@ -197,6 +202,18 @@ export default function BookAppointmentPage() {
               <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Doktor Seçin</h2>
               <p className="text-sm text-(--color-text-muted)">Şikayetinize göre önerilen doktorlar</p>
             </div>
+            
+            {recommendedDepartment && !recommendedDoctorId && (
+              <div className="p-3 bg-(--color-warning-muted) border border-warning/20 rounded-xl">
+                <p className="text-xs text-(--color-warning) font-medium">
+                  ⚠️ Şu an için bu vakaya uygun uzman doktor bulunmuyor.
+                </p>
+                <p className="text-xs text-(--color-text-muted) mt-1">
+                  Önerilen departman: <span className="font-semibold text-(--color-warning)">{recommendedDepartment}</span>
+                </p>
+              </div>
+            )}
+
             {mockDoctors.map((doctor) => {
               const dept = mockDepartments.find(d => d.id === doctor.departmentId);
               const isSelected = selectedDoctor?.id === doctor.id;
@@ -398,7 +415,7 @@ export default function BookAppointmentPage() {
                     <Sparkles size={14} className="text-(--color-primary)" />
                     <span className="text-xs font-bold text-(--color-primary)">AI Ön Analiz Raporu</span>
                   </div>
-                  <p className="text-xs text-(--color-text-primary) leading-relaxed italic">&quot;{aiReport}&quot;</p>
+                  <p className="text-xs text-(--color-text-primary) leading-relaxed italic">"{aiReport}"</p>
                   {uploadedDocs.length > 0 && (
                     <p className="text-xs text-(--color-text-muted) mt-2 font-medium">({uploadedDocs.length} belge eklendi)</p>
                   )}
