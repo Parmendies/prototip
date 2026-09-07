@@ -207,7 +207,6 @@ export default function StaffPage() {
               placeholder="Doktorun eğitim geçmişi, biyografisi ve öne çıkan deneyimleri..."
               className="px-4 py-3 text-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary)] resize-none"
             />
-            />
           </div>
         </div>
       </Modal>
