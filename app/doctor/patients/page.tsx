@@ -7,7 +7,7 @@ import { Button } from '@/app/_components/ui/Button';
 import { mockPatients, mockAppointments } from '@/app/_lib/mock-data';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Calendar, ChevronRight } from 'lucide-react';
+import { Search, Calendar, ChevronRight, Sparkles } from 'lucide-react';
 import { formatDate } from '@/app/_lib/utils';
 
 export default function DoctorPatientsPage() {
@@ -91,11 +91,16 @@ export default function DoctorPatientsPage() {
                         <Badge status={patient.status} dot size="xs" />
                       </td>
                       <td className="px-4 py-3">
-                        <Link href={`/doctor/patients/${patient.id}`}>
-                          <Button variant="ghost" size="xs" iconRight={<ChevronRight size={12} />}>
-                            Detay
+                        <div className="flex items-center justify-end gap-2 text-right">
+                          <Button variant="outline" size="xs" icon={<Sparkles size={12} className="text-(--color-primary)" />} onClick={() => alert(`${patient.firstName} için AI özeti hazırlanıyor...`)}>
+                            AI Özet
                           </Button>
-                        </Link>
+                          <Link href={`/doctor/patients/${patient.id}`}>
+                            <Button variant="ghost" size="xs" iconRight={<ChevronRight size={12} />}>
+                              Detay
+                            </Button>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

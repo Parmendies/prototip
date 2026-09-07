@@ -199,12 +199,14 @@ export default function StaffPage() {
           <Input id="staff-specialty" label="Uzmanlık" placeholder="Örn: Kardiyoloji" />
           <Input id="staff-room" label="Oda No" placeholder="Örn: 101" />
           <Input id="staff-floor" label="Kat" type="number" placeholder="1" />
-          <div className="col-span-2 flex flex-col gap-1.5 mt-2">
-            <label htmlFor="staff-description" className="text-sm font-medium text-[var(--color-text-secondary)]">Açıklama (Opsiyonel)</label>
+          <div className="col-span-2 flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[var(--color-text-secondary)]">Doktor Hakkında</label>
             <textarea
-              id="staff-description"
-              className="px-3.5 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-primary)] min-h-[80px]"
-              placeholder="Personel hakkında ek bilgiler..."
+              id="staff-about"
+              rows={3}
+              placeholder="Doktorun eğitim geçmişi, biyografisi ve öne çıkan deneyimleri..."
+              className="px-4 py-3 text-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary)] resize-none"
+            />
             />
           </div>
         </div>
