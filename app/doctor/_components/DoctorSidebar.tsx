@@ -1,99 +1,132 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
-  CalendarDays, Users, UserCircle, LogOut, Video,
+  CalendarDays,
+  Users,
+  LayoutDashboard,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { cn } from '@/app/_lib/utils';
-import { Avatar } from '@/app/_components/ui/Avatar';
+import { logoutStaffAction } from '@/app/(auth)/personel-giris/actions';
 
 const navItems = [
-  { href: '/doctor/calendar', label: 'Takvim',     icon: CalendarDays },
-  { href: '/doctor/patients', label: 'Hastalarım', icon: Users },
-  { href: '/doctor/profile',  label: 'Profilim',   icon: UserCircle },
+  { href: '/doctor/workspace', label: 'Çalışma Alanı', icon: LayoutDashboard },
+  { href: '/doctor/calendar',  label: 'Randevu Takvimi', icon: CalendarDays },
+  { href: '/doctor/patients',  label: 'Hasta Dosyaları', icon: Users },
+  { href: '/doctor/profile',   label: 'Profilim',        icon: User },
 ];
 
 export default function DoctorSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logoutStaffAction();
+    router.push('/personel-giris');
+    router.refresh();
+  };
 
   return (
-    <aside className="w-56 shrink-0 flex flex-col h-full bg-(--color-bg-surface) border-r border-(--color-border-subtle)">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-(--color-border-subtle)">
-        <div className="w-8 h-8 rounded-lg bg-linear-to-br from-(--color-secondary) to-(--color-primary) flex items-center justify-center text-sm shadow-(--shadow-glow-secondary)">
-          👨‍⚕️
+    <>
+      {/* DESKTOP SIDEBAR */}
+      <aside className="hidden md:flex w-60 shrink-0 flex-col h-full bg-(--color-bg-surface) border-r border-(--color-border-subtle)">
+        {/* Brand Header */}
+        <div className="flex items-center gap-3 px-5 py-5 border-b border-(--color-border-subtle)">
+          <div className="w-9 h-9 rounded-xl bg-(--color-primary) text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            🦷
+          </div>
+          <div>
+            <p className="text-sm font-bold text-(--color-text-primary) tracking-tight">
+              Denta<span className="text-(--color-primary)">Panel</span>
+            </p>
+            <p className="text-[10px] font-semibold text-(--color-text-muted) uppercase tracking-wider">
+              Hekim Çalışma Alanı
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-bold text-(--color-text-primary)">
-            Medi<span className="text-(--color-secondary)">Panel</span>
+
+        {/* Nav Items */}
+        <nav className="flex-1 px-3 py-4 space-y-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/doctor/workspace' && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold min-h-[44px] transition-all duration-150 cursor-pointer',
+                  isActive
+                    ? 'bg-(--color-primary) text-white shadow-(--shadow-primary-soft)'
+                    : 'text-(--color-text-secondary) hover:bg-(--color-bg-elevated) hover:text-(--color-text-primary)'
+                )}
+              >
+                <Icon size={18} className="shrink-0" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Quick Status Info */}
+        <div className="mx-3 my-2 p-3 rounded-xl bg-(--color-bg-elevated) border border-(--color-border-subtle)">
+          <div className="flex items-center gap-2 text-xs font-bold text-(--color-text-primary) mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Klinik Oturumu Aktif</span>
+          </div>
+          <p className="text-[11px] text-(--color-text-secondary) leading-relaxed">
+            Bekleme odası ve tahsilatlar banko ile canlı senkronizedir.
           </p>
-          <p className="text-[10px] text-(--color-text-muted)">Doktor Paneli</p>
         </div>
-      </div>
 
-      {/* Online badge */}
-      <div className="mx-3 mt-3 px-3 py-2 rounded-xl bg-(--color-bg-elevated) border border-(--color-border-subtle) flex items-center gap-2">
-        <Video size={12} className="text-(--color-primary) shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-(--color-text-muted)">Online görüşme</p>
-          <p className="text-xs font-semibold text-(--color-success) truncate">Aktif</p>
+        {/* Footer / Logout */}
+        <div className="p-3 border-t border-(--color-border-subtle)">
+          <button
+            onClick={handleLogout}
+            className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-red-200"
+          >
+            <LogOut size={16} />
+            <span>Güvenli Çıkış Yap</span>
+          </button>
         </div>
-      </div>
+      </aside>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-(--color-bg-surface) border-t border-(--color-border-subtle) flex items-center justify-around pt-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom))] px-2 shadow-lg">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname.startsWith(item.href);
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/doctor/workspace' && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
-              id={`doctor-nav-${item.label.toLowerCase()}`}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                'flex flex-col items-center justify-center gap-1 min-h-[48px] py-1 px-3 rounded-xl text-[10px] font-semibold transition-all cursor-pointer',
                 isActive
-                  ? 'bg-(--color-primary) text-white shadow-md font-semibold'
-                  : 'text-(--color-text-muted) hover:bg-(--color-bg-elevated) hover:text-(--color-text-secondary)'
+                  ? 'text-(--color-primary) font-bold'
+                  : 'text-(--color-text-secondary) hover:text-(--color-text-primary)'
               )}
             >
-              <Icon size={16} className="shrink-0" />
-              {item.label}
+              <Icon size={19} strokeWidth={isActive ? 2.4 : 1.8} />
+              <span>{item.label.split(' ')[0]}</span>
             </Link>
           );
         })}
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center justify-center gap-1 min-h-[48px] py-1 px-3 rounded-xl text-[10px] font-semibold text-red-600 hover:text-red-700 cursor-pointer"
+        >
+          <LogOut size={19} />
+          <span>Çıkış</span>
+        </button>
       </nav>
-
-      {/* Divider */}
-      <div className="mx-3 divider" />
-
-      {/* Today summary */}
-      <div className="mx-3 my-3 p-3 rounded-xl bg-(--color-bg-elevated)">
-        <p className="text-[10px] text-(--color-text-muted) mb-2">Bugün</p>
-        <div className="grid grid-cols-2 gap-1.5">
-          <div className="text-center py-1 rounded-lg bg-(--color-bg-surface)">
-            <p className="text-base font-bold text-(--color-primary)">5</p>
-            <p className="text-[9px] text-(--color-text-muted)">Randevu</p>
-          </div>
-          <div className="text-center py-1 rounded-lg bg-(--color-bg-surface)">
-            <p className="text-base font-bold text-(--color-secondary)">2</p>
-            <p className="text-[9px] text-(--color-text-muted)">Online</p>
-          </div>
-        </div>
-      </div>
-
-      {/* User */}
-      <div className="mx-3 mb-3 p-3 rounded-xl bg-(--color-bg-elevated) flex items-center gap-2">
-        <Avatar firstName="Ahmet" lastName="Kaya" size="sm" online />
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-(--color-text-primary) truncate">Prof. Dr. Kaya</p>
-          <p className="text-[10px] text-(--color-text-muted)">Kardiyoloji</p>
-        </div>
-        <Link href="/" className="text-(--color-text-muted) hover:text-(--color-error) transition-colors p-1" aria-label="Çıkış">
-          <LogOut size={13} />
-        </Link>
-      </div>
-    </aside>
+    </>
   );
 }

@@ -1,464 +1,542 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { clinicDateOffset } from '@/lib/time';
+import { isWorkingDay, MAX_BOOKING_DAYS_AHEAD, type Slot, type WorkingSchedule } from '@/lib/slots';
+import { getActiveDoctors, createAppointmentPreRequest, getAvailableSlots, getStepBookingInfo } from './actions';
 import { Card } from '@/app/_components/ui/Card';
 import { Button } from '@/app/_components/ui/Button';
-import { Badge } from '@/app/_components/ui/Badge';
-import { Avatar } from '@/app/_components/ui/Avatar';
-import { mockDoctors, mockDepartments } from '@/app/_lib/mock-data';
-import { useState } from 'react';
 import {
-  ChevronRight, ChevronLeft, Star,
-  Video, MapPin, Check, Clock, UploadCloud, File, Sparkles
+  Stethoscope,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
-import { cn } from '@/app/_lib/utils';
-import { TIME_SLOTS } from '@/app/_lib/constants';
-import { generateMedicalReport } from './actions';
+import Link from 'next/link';
 
-const TOTAL_STEPS = 5;
+const QUICK_TAGS = [
+  'Diş Ağrısı / Sızlama',
+  'Kırık / Düşen Dolgu',
+  'Diş Eti Kanaması / Şişlik',
+  '20 Yaş Dişi Ağrısı',
+  'Diş Taşı Temizliği',
+  'Genel Kontrol & Muayene',
+  'İmplant / Protez Danışma',
+  'Estetik / Beyazlatma',
+];
 
-const tags = ['Baş ağrısı', 'Göğüs ağrısı', 'Diz ağrısı', 'Nefes darlığı', 'Çarpıntı', 'Ateş', 'Yorgunluk', 'Sırt ağrısı'];
-
-const mockCalendarDays = Array.from({ length: 14 }, (_, i) => {
-  const d = new Date(2026, 3, 16 + i); // April 16+
-  return { date: d, slots: Math.floor(Math.random() * 8) + 1 };
-});
 
 export default function BookAppointmentPage() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [doctors, setDoctors] = useState<Awaited<ReturnType<typeof getActiveDoctors>>>([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
   const [complaint, setComplaint] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedDoctor, setSelectedDoctor] = useState<typeof mockDoctors[0] | null>(null);
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [aptType, setAptType] = useState<'face_to_face' | 'online'>('face_to_face');
-  const [uploadedDocs, setUploadedDocs] = useState<File[]>([]);
-  const [isAiGenerating, setIsAiGenerating] = useState(false);
-  const [aiReport, setAiReport] = useState<string | null>(null);
-  const [recommendedDoctorId, setRecommendedDoctorId] = useState<string | null>(null);
-  const [recommendedDepartment, setRecommendedDepartment] = useState<string | null>(null);
 
-  const progress = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isDone, setIsDone] = useState(false);
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsWorkingDay, setSlotsWorkingDay] = useState(true);
+  // Tedavi planındaki bir seans için talep (/patient/book?step=<id>)
+  const [sessionStep, setSessionStep] = useState<Awaited<ReturnType<typeof getStepBookingInfo>>>(null);
 
-  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files.length > 0) {
-      setUploadedDocs(prev => [...prev, ...Array.from(e.target.files as FileList)]);
+  useEffect(() => {
+    async function load() {
+      setIsLoading(true);
+      try {
+        const stepParam = new URLSearchParams(window.location.search).get('step');
+        const [docs, stepInfo] = await Promise.all([
+          getActiveDoctors(),
+          stepParam ? getStepBookingInfo(stepParam) : Promise.resolve(null),
+        ]);
+        setDoctors(docs);
+
+        let doctor = docs[0];
+        if (stepParam) {
+          const planDoctor = stepInfo && docs.find((d) => d.id === stepInfo.doctorId);
+          if (stepInfo && planDoctor) {
+            setSessionStep(stepInfo);
+            doctor = planDoctor;
+            setStep(3); // hekim ve işlem belli: doğrudan tarih/saat seçimine
+          } else {
+            setError('Bu seans için zaten randevu talebiniz var veya seans artık randevuya uygun değil. Yeni bir muayene talebi oluşturabilirsiniz.');
+          }
+        }
+        if (doctor) setSelectedDoctorId(doctor.id);
+
+        // Varsayılan tarih: hekimin bugünden sonraki ilk çalışma günü
+        const firstSchedule = doctor?.workingSchedule as WorkingSchedule | null | undefined;
+        setSelectedDate(nextWorkingDays(firstSchedule, 1)[0] ?? clinicDateOffset(1));
+      } catch {
+        setError('Hekim listesi alınamadı.');
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
+    load();
+  }, []);
 
-  async function handleNextStep1() {
-    setIsAiGenerating(true);
+  const selectedDoctor = doctors.find((d) => d.id === selectedDoctorId);
+  const selectedSchedule = selectedDoctor?.workingSchedule as WorkingSchedule | null | undefined;
+  const dateOptions = nextWorkingDays(selectedSchedule, 14);
+
+  // Hekim değişince seçili tarih o hekimin çalışma günü değilse ilk uygun güne kaydır
+  useEffect(() => {
+    if (!selectedDoctorId) return;
+    const schedule = doctors.find((d) => d.id === selectedDoctorId)?.workingSchedule as WorkingSchedule | null | undefined;
+    if (selectedDate && !isWorkingDay(schedule, selectedDate)) {
+      const first = nextWorkingDays(schedule, 1)[0];
+      if (first) setSelectedDate(first);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDoctorId]);
+
+  // Seçilen hekim + tarih için gerçek boş saatleri sunucudan çek
+  useEffect(() => {
+    if (step !== 3 || !selectedDoctorId || !selectedDate) return;
+    let cancelled = false;
+    setSlotsLoading(true);
+    setSelectedSlot(null);
+    getAvailableSlots(selectedDoctorId, selectedDate, sessionStep?.id)
+      .then((res) => {
+        if (cancelled) return;
+        setSlots(res.slots);
+        setSlotsWorkingDay(res.isWorkingDay);
+      })
+      .catch(() => {
+        if (!cancelled) setError('Uygun saatler alınamadı.');
+      })
+      .finally(() => {
+        if (!cancelled) setSlotsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, selectedDoctorId, selectedDate, sessionStep]);
+
+  async function handleSubmit() {
+    if (!selectedDoctorId || !selectedDate || !selectedSlot) {
+      setError('Lütfen tüm seçimleri tamamlayınız.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
     try {
-      const formData = new FormData();
-      formData.append('complaint', complaint);
-      formData.append('selectedTags', JSON.stringify(selectedTags));
-
-      uploadedDocs.forEach(doc => {
-        formData.append('files', doc);
+      const res = await createAppointmentPreRequest({
+        doctorId: selectedDoctorId,
+        appointmentDate: selectedDate,
+        startTime: selectedSlot,
+        complaintText: complaint || (sessionStep ? '' : 'Genel Muayene'),
+        treatmentStepId: sessionStep?.id,
       });
 
-      const response = await generateMedicalReport(formData);
-      
-      if (!response.success) {
-        throw new Error(response.error);
+      if (res.success) {
+        setIsDone(true);
+      } else {
+        setError(res.error || 'Ön talep oluşturulamadı.');
+        // Saat bu arada dolmuş olabilir: listeyi tazele
+        const fresh = await getAvailableSlots(selectedDoctorId, selectedDate, sessionStep?.id);
+        setSlots(fresh.slots);
+        setSelectedSlot(null);
       }
-
-      const aiData = response.data;
-      setAiReport(aiData.report);
-
-      if (aiData.recommendedDoctorId) {
-        setRecommendedDoctorId(aiData.recommendedDoctorId);
-        const doc = mockDoctors.find(d => d.id === aiData.recommendedDoctorId);
-        if (doc) setSelectedDoctor(doc);
-      }
-
-      if (aiData.recommendedDepartment) {
-        setRecommendedDepartment(aiData.recommendedDepartment);
-      }
-
-      setStep(2);
-    } catch (error: any) {
-      console.error(error);
-      alert("AI analizi sırasında bir hata oluştu: " + error.message);
+    } catch {
+      setError('Bağlantı hatası oluştu.');
     } finally {
-      setIsAiGenerating(false);
+      setIsSubmitting(false);
     }
   }
 
-  function toggleTag(tag: string) {
-    setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
-  }
-
-
-  return (
-    <div className="w-full">
-      <div className="w-150" />
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-(--color-bg-base)/90 backdrop-blur-xl px-4 pt-4 pb-3 border-b border-(--color-border-subtle)">
-        <div className="flex items-center gap-3 mb-3">
-          <button
-            onClick={() => step > 1 && setStep(s => s - 1)}
-            className={cn('text-(--color-text-muted) hover:text-(--color-text-primary) transition-colors p-1 rounded-lg hover:bg-(--color-bg-elevated)', step <= 1 && 'invisible')}
-            aria-label="Geri"
-          >
-            <ChevronLeft size={20} />
-          </button>
-
-          <div className="flex-1 text-center">
-            <p className="text-sm font-semibold text-(--color-text-primary)">
-              {['Şikayetiniz', 'Doktor Seçin', 'Tarih Seçin', 'Saat Seçin', 'Onaylayın'][step - 1]}
-            </p>
-            <p className="text-[10px] text-(--color-text-muted)">Adım {step} / {TOTAL_STEPS}</p>
-          </div>
-          <div className="w-8" />
-        </div>
-        {/* Progress bar */}
-        <div className="w-full h-1.5 rounded-full bg-(--color-bg-elevated)">
-          <div
-            className="h-full rounded-full bg-linear-to-r from-(--color-primary) to-(--color-secondary) transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-(--color-bg-base) flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-8 h-8 border-3 border-(--color-primary) border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-xs text-(--color-text-secondary)">Hekim takvimi yükleniyor...</p>
         </div>
       </div>
+    );
+  }
 
-      <div className="px-4 py-5">
+  if (isDone) {
+    return (
+      <div className="min-h-screen bg-(--color-bg-base) flex items-center justify-center p-4">
+        <Card padding="lg" className="max-w-md w-full text-center shadow-(--shadow-lg)">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <h1 className="text-xl font-bold text-(--color-text-primary)">
+            Randevu Ön Talebiniz Alındı!
+          </h1>
+          <p className="text-xs text-(--color-text-secondary) mt-2 mb-6 leading-relaxed">
+            Talebiniz bankodaki sekreterimize iletildi. Randevu saatinizi kesinleştirmek için sekreterimiz sizi telefonla arayacaktır.
+          </p>
 
-        {/* STEP 1: Complaint */}
-        {step === 1 && (
-          <div className="space-y-4 animate-slide-up">
-            <div>
-              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Şikayetinizi anlatın</h2>
-              <p className="text-sm text-(--color-text-muted)">AI size en uygun doktoru bulacak</p>
+          <div className="p-4 rounded-xl bg-(--color-bg-elevated) border border-(--color-border-subtle) text-left text-xs space-y-2 mb-6">
+            <div className="flex justify-between">
+              <span className="text-(--color-text-muted)">Hekim:</span>
+              <span className="font-semibold text-(--color-text-primary)">
+                {selectedDoctor?.title} {selectedDoctor?.fullName}
+              </span>
             </div>
-            <textarea
-              id="complaint-input"
-              placeholder="Örn: 3 gündür göğüs ağrısı ve nefes darlığı çekiyorum..."
-              value={complaint}
-              onChange={e => setComplaint(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-3 text-sm rounded-2xl border border-(--color-border) bg-(--color-bg-surface) text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-primary) resize-none"
-            />
+            <div className="flex justify-between">
+              <span className="text-(--color-text-muted)">Tarih & Saat:</span>
+              <span className="font-semibold text-(--color-text-primary)">
+                {selectedDate} — {selectedSlot}
+              </span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-(--color-border-subtle)">
+              <span className="text-(--color-text-muted)">{sessionStep ? sessionStep.title : 'Ön Muayene Ücreti'}:</span>
+              <span className="font-bold text-(--color-primary)">
+                {(sessionStep ? sessionStep.price : Number(selectedDoctor?.initialExamFee)).toLocaleString('tr-TR')} ₺ (Bankoda Ödenecek)
+              </span>
+            </div>
+          </div>
+
+          <Link
+            href="/patient"
+            className="w-full min-h-[48px] inline-flex items-center justify-center rounded-xl bg-(--color-primary) hover:bg-(--color-primary-dark) text-white text-base font-semibold"
+          >
+            Randevularıma & Portala Dön
+          </Link>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-(--color-bg-base) pb-12">
+      {/* Header */}
+      <header className="bg-white border-b border-(--color-border-subtle) px-4 py-4 sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <Link href="/patient" className="text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-primary) flex items-center gap-1">
+            <ArrowLeft className="w-4 h-4" /> Portala Dön
+          </Link>
+          <span className="text-sm font-bold text-(--color-text-primary)">
+            {sessionStep ? 'Tedavi Seansı Talebi' : `Randevu Ön Talebi (Adım ${step}/3)`}
+          </span>
+          <div className="w-16" />
+        </div>
+      </header>
+
+      <main className="max-w-2xl mx-auto px-4 pt-6">
+        {error && (
+          <div className="mb-4 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* STEP 1: HEKİM SEÇİMİ */}
+        {step === 1 && (
+          <div className="space-y-4">
             <div>
-              <p className="text-xs font-medium text-(--color-text-secondary) mb-2">Veya semptom seçin:</p>
+              <h2 className="text-lg font-bold text-(--color-text-primary)">
+                1. Muayene Olmak İstediğiniz Hekimi Seçin
+              </h2>
+              <p className="text-xs text-(--color-text-secondary) mt-0.5">
+                Ön muayene ücreti hekimin uzmanlığına göre değişmekte olup bankoda tahsil edilir.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              {doctors.map((doc) => {
+                const isSelected = selectedDoctorId === doc.id;
+                return (
+                  <button
+                    type="button"
+                    key={doc.id}
+                    onClick={() => setSelectedDoctorId(doc.id)}
+                    aria-pressed={isSelected}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-(--color-primary-muted)/50 border-2 border-(--color-primary) shadow-sm'
+                        : 'bg-white border-(--color-border-subtle) hover:border-(--color-border)'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                          isSelected ? 'bg-(--color-primary) text-white shadow-xs' : 'bg-(--color-bg-elevated) text-(--color-primary)'
+                        }`}>
+                          <Stethoscope className="w-6 h-6" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-bold text-(--color-text-primary) truncate">
+                            {doc.title} {doc.fullName}
+                          </h3>
+                          <p className="text-xs text-(--color-text-secondary) mt-0.5 truncate font-medium">
+                            {doc.branch}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-[11px] font-semibold text-(--color-text-secondary) block">Muayene Ücreti</span>
+                        <span className="text-sm font-extrabold text-(--color-primary) font-mono">
+                          {Number(doc.initialExamFee).toLocaleString('tr-TR')} ₺
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <Button
+              onClick={() => setStep(2)}
+              variant="primary"
+              size="lg"
+              className="w-full justify-center min-h-[48px] text-sm font-bold shadow-(--shadow-primary-soft) mt-4"
+              disabled={!selectedDoctorId}
+            >
+              Devam Et: Şikayet & Detaylar <ArrowRight className="w-4 h-4 ml-1.5" />
+            </Button>
+          </div>
+        )}
+
+        {/* STEP 2: ŞİKAYET GİRİŞİ */}
+        {step === 2 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-bold text-(--color-text-primary)">
+                2. Şikayetinizi veya İşlem Talebinizi Belirtin
+              </h2>
+              <p className="text-xs text-(--color-text-secondary) mt-0.5">
+                Hekiminizin önceden hazırlanabilmesi için kısaca açıklayınız.
+              </p>
+            </div>
+
+            {/* Quick tags */}
+            <div>
+              <label className="block text-xs font-bold text-(--color-text-secondary) mb-2">
+                Hızlı Seçim Etiketleri
+              </label>
               <div className="flex flex-wrap gap-2">
-                {tags.map(tag => (
+                {QUICK_TAGS.map((tag) => (
                   <button
                     key={tag}
-                    id={`symptom-${tag.toLowerCase().replace(/\s/g, '-')}`}
-                    onClick={() => toggleTag(tag)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-full text-sm border transition-all duration-150',
-                      selectedTags.includes(tag)
-                        ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary) font-medium'
-                        : 'border-(--color-border) text-(--color-text-muted) hover:border-(--color-border)'
-                    )}
+                    type="button"
+                    onClick={() => {
+                      if (complaint.includes(tag)) return;
+                      setComplaint((prev) => (prev ? `${prev}, ${tag}` : tag));
+                    }}
+                    className="min-h-[38px] text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-white border border-(--color-border-subtle) hover:border-(--color-primary) hover:text-(--color-primary) transition-all text-(--color-text-secondary) cursor-pointer active:scale-95 shadow-2xs"
                   >
-                    {tag}
+                    + {tag}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Document Upload */}
-            <div className="mt-4">
-              <p className="text-xs font-medium text-(--color-text-secondary) mb-2">Tahlil veya Görüntü Yükle (İsteğe bağlı):</p>
-              <label className="flex items-center justify-center w-full p-4 border-2 border-dashed border-(--color-border) rounded-2xl cursor-pointer hover:border-(--color-primary) transition-colors bg-(--color-bg-surface)">
-                <div className="flex flex-col items-center gap-2">
-                  <UploadCloud size={24} className="text-(--color-primary)" />
-                  <span className="text-sm font-medium text-(--color-text-muted)">Belge Yüklemek İçin Tıklayın</span>
-                </div>
-                <input type="file" multiple accept=".pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileUpload} />
+            <div>
+              <label className="block text-xs font-bold text-(--color-text-secondary) mb-1.5">
+                Şikayet Detayı
               </label>
+              <textarea
+                rows={4}
+                value={complaint}
+                onChange={(e) => setComplaint(e.target.value)}
+                placeholder="Örn: Sol alt azı dişimde 2 gündür soğuk su içerken şiddetli sızlama oluyor..."
+                className="w-full p-3.5 rounded-xl bg-white border border-(--color-border-subtle) text-sm font-medium text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:ring-2 focus:ring-(--color-primary) focus:outline-none resize-none"
+              />
+            </div>
 
-              {uploadedDocs.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {uploadedDocs.map((doc, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-(--color-bg-elevated) p-2.5 rounded-xl border border-(--color-border-subtle)">
-                      <File size={16} className="text-(--color-secondary)" />
-                      <span className="text-xs text-(--color-text-primary) truncate flex-1">{doc.name}</span>
-                    </div>
+            <div className="flex items-center gap-3 pt-2">
+              <Button onClick={() => setStep(1)} variant="outline" size="lg" className="w-1/3 justify-center min-h-[48px] font-semibold">
+                <ArrowLeft className="w-4 h-4 mr-1.5" /> Geri
+              </Button>
+              <Button onClick={() => setStep(3)} variant="primary" size="lg" className="w-2/3 justify-center min-h-[48px] font-bold shadow-(--shadow-primary-soft)">
+                Devam Et: Tarih & Saat <ArrowRight className="w-4 h-4 ml-1.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: TARİH & SLOT SEÇİMİ VE ONAY */}
+        {step === 3 && (
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-lg font-bold text-(--color-text-primary)">
+                {sessionStep ? 'Seansınız İçin Tarih ve Saat Seçin' : '3. Tarih ve Randevu Saati Seçimi'}
+              </h2>
+              <p className="text-xs text-(--color-text-secondary) mt-0.5">
+                Seçtiğiniz saat ön talep olarak sekretere iletilecek ve teyit edilecektir.
+              </p>
+            </div>
+
+            {/* Tarih seçimi: yalnızca hekimin çalışma günleri */}
+            <div>
+              <label className="block text-xs font-bold text-(--color-text-secondary) mb-1.5">
+                Randevu Tarihi
+              </label>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
+                {dateOptions.map((d) => {
+                  const isSelected = selectedDate === d;
+                  const { weekday, day, month } = formatDateChip(d);
+                  return (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setSelectedDate(d)}
+                      aria-pressed={isSelected}
+                      className={`shrink-0 min-w-[64px] min-h-[64px] px-2 py-2 rounded-xl border text-center transition-all cursor-pointer select-none ${
+                        isSelected
+                          ? 'bg-(--color-primary) text-white border-(--color-primary) shadow-(--shadow-primary-soft)'
+                          : 'bg-white text-(--color-text-primary) border-(--color-border-subtle) hover:border-(--color-primary)'
+                      }`}
+                    >
+                      <span className={`block text-[11px] font-semibold ${isSelected ? 'text-white/85' : 'text-(--color-text-secondary)'}`}>{weekday}</span>
+                      <span className="block text-lg font-bold tabular-nums leading-tight">{day}</span>
+                      <span className={`block text-[11px] ${isSelected ? 'text-white/85' : 'text-(--color-text-muted)'}`}>{month}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Slots Grid */}
+            <div>
+              <label className="block text-xs font-bold text-(--color-text-secondary) mb-2">
+                Uygun Saat Dilimi Seçiniz
+              </label>
+              {slotsLoading ? (
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2" aria-busy="true">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="min-h-[44px] rounded-xl bg-(--color-bg-elevated) animate-pulse" />
                   ))}
                 </div>
+              ) : !slotsWorkingDay || slots.length === 0 ? (
+                <div className="p-4 rounded-xl bg-white border border-dashed border-(--color-border-subtle) text-center text-xs text-(--color-text-secondary)">
+                  Bu gün için randevu saati bulunmuyor. Lütfen başka bir gün seçiniz.
+                </div>
+              ) : slots.every((sl) => !sl.available) ? (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-center text-xs text-amber-900 font-medium">
+                  Bu günün tüm saatleri dolu. Lütfen başka bir gün seçiniz.
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                    {slots.map((slot) => {
+                      const isSelected = selectedSlot === slot.time;
+                      return (
+                        <button
+                          key={slot.time}
+                          type="button"
+                          disabled={!slot.available}
+                          onClick={() => setSelectedSlot(slot.time)}
+                          aria-pressed={isSelected}
+                          aria-label={slot.available ? slot.time : `${slot.time} — ${slot.reason === 'busy' ? 'dolu' : 'uygun değil'}`}
+                          className={`min-h-[44px] py-2.5 rounded-xl text-xs font-mono font-bold transition-all border select-none ${
+                            !slot.available
+                              ? 'bg-(--color-bg-elevated) text-(--color-text-muted) border-transparent line-through cursor-not-allowed'
+                              : isSelected
+                                ? 'bg-(--color-primary) text-white border-(--color-primary) shadow-(--shadow-primary-soft) cursor-pointer'
+                                : 'bg-white text-(--color-text-primary) border-(--color-border-subtle) hover:border-(--color-primary) cursor-pointer'
+                          }`}
+                        >
+                          {slot.time}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] text-(--color-text-muted) mt-2">Üstü çizili saatler dolu veya uygun değil.</p>
+                </>
               )}
             </div>
 
-            <Button
-              id="step1-next"
-              fullWidth
-              onClick={handleNextStep1}
-              disabled={isAiGenerating}
-              iconRight={isAiGenerating ? undefined : <Sparkles size={16} />}
-              size="lg"
-              className="mt-4 gap-2"
-            >
-              {isAiGenerating ? 'AI Analizi Yapılıyor...' : 'Doktor Bul & Analiz Et'}
-            </Button>
-          </div>
-        )}
-
-        {/* STEP 2: Doctor selection */}
-        {step === 2 && (
-          <div className="space-y-3 animate-slide-up">
-            <div>
-              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Doktor Seçin</h2>
-              <p className="text-sm text-(--color-text-muted)">Şikayetinize göre önerilen doktorlar</p>
-            </div>
-            
-            {recommendedDepartment && !recommendedDoctorId && (
-              <div className="p-3 bg-(--color-warning-muted) border border-warning/20 rounded-xl">
-                <p className="text-xs text-(--color-warning) font-medium">
-                  ⚠️ Şu an için bu vakaya uygun uzman doktor bulunmuyor.
-                </p>
-                <p className="text-xs text-(--color-text-muted) mt-1">
-                  Önerilen departman: <span className="font-semibold text-(--color-warning)">{recommendedDepartment}</span>
-                </p>
+            {/* Summary Box */}
+            <div className="p-4 rounded-2xl bg-white border border-(--color-border-subtle) shadow-xs space-y-2 text-xs">
+              <div className="font-bold text-(--color-text-primary) text-sm pb-2 border-b border-(--color-border-subtle)">
+                Randevu Özeti
               </div>
-            )}
-
-            {mockDoctors.map((doctor) => {
-              const dept = mockDepartments.find(d => d.id === doctor.departmentId);
-              const isSelected = selectedDoctor?.id === doctor.id;
-              const isAiRecommended = recommendedDoctorId === doctor.id;
-
-              return (
-                <button
-                  key={doctor.id}
-                  id={`doctor-card-${doctor.id}`}
-                  onClick={() => setSelectedDoctor(doctor)}
-                  className={cn(
-                    'w-full text-left p-4 rounded-2xl border transition-all duration-150',
-                    isSelected
-                      ? 'border-(--color-primary) bg-(--color-primary-muted)'
-                      : 'border-(--color-border-subtle) bg-(--color-bg-surface) hover:border-(--color-border)'
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar firstName={doctor.firstName} lastName={doctor.lastName} size="lg" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <p className="text-sm font-bold text-(--color-text-primary) truncate">
-                          {doctor.title} {doctor.lastName}
-                        </p>
-                        {isAiRecommended && (
-                          <span className="flex items-center text-[10px] font-bold bg-(--color-primary-muted) text-(--color-primary) px-1.5 py-0.5 rounded-md gap-0.5 border border-(--color-primary)/20">
-                            <Sparkles size={10} /> AI Önerisi
-                          </span>
-                        )}
-                        {isSelected && <Check size={14} className="text-(--color-primary) shrink-0 ml-auto" />}
-                      </div>
-                      <p className="text-xs text-(--color-text-muted) truncate">{doctor.specialty}</p>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <div className="flex items-center gap-0.5">
-                          <Star size={11} className="text-(--color-accent) fill-(--color-accent)" />
-                          <span className="text-xs font-semibold text-(--color-text-primary)">{doctor.rating}</span>
-                          <span className="text-[10px] text-(--color-text-muted)">({doctor.reviewCount})</span>
-                        </div>
-                        <span className="text-[10px] text-(--color-text-muted)">{doctor.experienceYears} yıl deneyim</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    {dept && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: `${dept.color}22`, color: dept.color }}>
-                        {dept.icon} {dept.name}
-                      </span>
-                    )}
-                    {doctor.availableForOnline && (
-                      <Badge variant="primary" size="xs">
-                        <Video size={9} className="mr-0.5" /> Online
-                      </Badge>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-            <Button fullWidth size="lg" onClick={() => setStep(3)} disabled={!selectedDoctor} iconRight={<ChevronRight size={16} />}>
-              Devam Et
-            </Button>
-          </div>
-        )}
-
-        {/* STEP 3: Date selection */}
-        {step === 3 && (
-          <div className="space-y-4 animate-slide-up">
-            <div>
-              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Tarih Seçin</h2>
-              <p className="text-sm text-(--color-text-muted)">Müsait günleri görebilirsiniz</p>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {mockCalendarDays.map(({ date, slots }) => {
-                const isSelected = selectedDay?.toDateString() === date.toDateString();
-                return (
-                  <button
-                    key={date.toISOString()}
-                    onClick={() => setSelectedDay(date)}
-                    className={cn(
-                      'flex flex-col items-center py-3 rounded-2xl border transition-all duration-150',
-                      isSelected
-                        ? 'border-(--color-primary) bg-(--color-primary-muted)'
-                        : 'border-(--color-border-subtle) bg-(--color-bg-surface) hover:border-(--color-border)'
-                    )}
-                  >
-                    <span className="text-[10px] text-(--color-text-muted) uppercase">
-                      {date.toLocaleDateString('tr-TR', { weekday: 'short' })}
-                    </span>
-                    <span className={cn(
-                      'text-lg font-bold mt-0.5',
-                      isSelected ? 'text-(--color-primary)' : 'text-(--color-text-primary)'
-                    )}>
-                      {date.getDate()}
-                    </span>
-                    <span className={cn(
-                      'text-[9px] mt-0.5',
-                      slots > 4 ? 'text-(--color-success)' : slots > 1 ? 'text-(--color-warning)' : 'text-(--color-error)'
-                    )}>
-                      {slots} slot
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <Button fullWidth size="lg" onClick={() => setStep(4)} disabled={!selectedDay} iconRight={<ChevronRight size={16} />}>
-              Devam Et
-            </Button>
-          </div>
-        )}
-
-        {/* STEP 4: Time slot */}
-        {step === 4 && (
-          <div className="space-y-4 animate-slide-up">
-            <div>
-              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Saat Seçin</h2>
-              <p className="text-sm text-(--color-text-muted)">
-                {selectedDay?.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })}
-              </p>
-            </div>
-
-            {/* Appointment type */}
-            <div className="grid grid-cols-2 gap-2">
-              {(['face_to_face', 'online'] as const).map((type) => (
-                <button
-                  key={type}
-                  id={`apt-type-${type}`}
-                  onClick={() => setAptType(type)}
-                  className={cn(
-                    'flex items-center gap-2 p-3 rounded-2xl border transition-all duration-150',
-                    aptType === type
-                      ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
-                      : 'border-(--color-border-subtle) text-(--color-text-muted)'
-                  )}
-                >
-                  {type === 'online' ? <Video size={16} /> : <MapPin size={16} />}
-                  <span className="text-sm font-medium">{type === 'online' ? 'Online' : 'Yüz Yüze'}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {TIME_SLOTS.slice(0, 12).map(slot => {
-                const isBooked = ['09:00', '10:30', '14:00'].includes(slot);
-                const isSelected = selectedSlot === slot;
-                return (
-                  <button
-                    key={slot}
-                    id={`time-slot-${slot}`}
-                    disabled={isBooked}
-                    onClick={() => setSelectedSlot(slot)}
-                    className={cn(
-                      'flex items-center justify-center gap-1.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150',
-                      isBooked
-                        ? 'border-(--color-border-subtle) text-(--color-text-muted) opacity-40 cursor-not-allowed line-through'
-                        : isSelected
-                          ? 'border-(--color-primary) bg-(--color-primary-muted) text-(--color-primary)'
-                          : 'border-(--color-border) text-(--color-text-secondary) hover:border-(--color-primary) hover:text-(--color-primary)'
-                    )}
-                  >
-                    <Clock size={12} />
-                    {slot}
-                  </button>
-                );
-              })}
-            </div>
-            <Button fullWidth size="lg" onClick={() => setStep(5)} disabled={!selectedSlot} iconRight={<ChevronRight size={16} />}>
-              Devam Et
-            </Button>
-          </div>
-        )}
-
-        {/* STEP 5: Confirm */}
-        {step === 5 && selectedDoctor && selectedDay && selectedSlot && (
-          <div className="space-y-4 animate-slide-up">
-            <div>
-              <h2 className="text-lg font-bold text-(--color-text-primary) mb-1">Randevu Özeti</h2>
-              <p className="text-sm text-(--color-text-muted)">Onaylamadan önce kontrol edin</p>
-            </div>
-
-            <Card>
-              <div className="flex items-center gap-3 mb-4">
-                <Avatar firstName={selectedDoctor.firstName} lastName={selectedDoctor.lastName} size="lg" />
-                <div>
-                  <p className="font-bold text-(--color-text-primary)">
-                    {selectedDoctor.title} {selectedDoctor.firstName} {selectedDoctor.lastName}
-                  </p>
-                  <p className="text-sm text-(--color-text-muted)">{selectedDoctor.specialty}</p>
+              <div className="flex justify-between">
+                <span className="text-(--color-text-secondary)">Hekim:</span>
+                <span className="font-semibold text-(--color-text-primary)">
+                  {selectedDoctor?.title} {selectedDoctor?.fullName} ({selectedDoctor?.branch})
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-(--color-text-secondary)">Tarih & Saat:</span>
+                <span className="font-semibold text-(--color-text-primary) font-mono">
+                  {selectedDate} — {selectedSlot || 'Seçilmedi'}
+                </span>
+              </div>
+              {sessionStep ? (
+                <div className="flex justify-between">
+                  <span className="text-(--color-text-secondary)">İşlem:</span>
+                  <span className="text-(--color-text-primary) font-semibold text-right">
+                    {sessionStep.title}
+                    {sessionStep.fdiNumber ? ` (#${sessionStep.fdiNumber})` : ''} • {sessionStep.durationMin} dk
+                  </span>
                 </div>
-              </div>
-              <div className="space-y-3 pt-3 divider">
-                <SummaryRow label="Tarih" value={selectedDay.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' })} />
-                <SummaryRow label="Saat" value={`${selectedSlot} – ${nextSlot(selectedSlot)}`} />
-                <SummaryRow label="Tür" value={aptType === 'online' ? '🎥 Online (Zoom)' : '🏥 Yüz Yüze'} />
-                {complaint && <SummaryRow label="Şikayet" value={complaint.slice(0, 80) + (complaint.length > 80 ? '...' : '')} />}
-              </div>
-
-              {aiReport && (
-                <div className="mt-4 p-3 bg-linear-to-br from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Sparkles size={14} className="text-(--color-primary)" />
-                    <span className="text-xs font-bold text-(--color-primary)">AI Ön Analiz Raporu</span>
-                  </div>
-                  <p className="text-xs text-(--color-text-primary) leading-relaxed italic">"{aiReport}"</p>
-                  {uploadedDocs.length > 0 && (
-                    <p className="text-xs text-(--color-text-muted) mt-2 font-medium">({uploadedDocs.length} belge eklendi)</p>
-                  )}
+              ) : (
+                <div className="flex justify-between">
+                  <span className="text-(--color-text-secondary)">Şikayet:</span>
+                  <span className="text-(--color-text-primary) italic max-w-xs truncate">
+                    {complaint || 'Belirtilmedi'}
+                  </span>
                 </div>
               )}
-            </Card>
-
-            {/* Policy note */}
-            <div className="rounded-2xl bg-(--color-warning-muted) border border-warning/20 p-3">
-              <p className="text-xs text-(--color-warning) font-medium mb-1">⚠️ İptal Politikası</p>
-              <p className="text-xs text-(--color-text-muted)">
-                Randevunuzu, başlangıçtan 24 saat önceye kadar ücretsiz iptal edebilirsiniz.
-                Erteleme için 12 saat kural geçerlidir.
-              </p>
+              <div className="flex justify-between pt-2 border-t border-(--color-border-subtle) font-bold">
+                <span className="text-(--color-text-secondary)">{sessionStep ? 'Seans Ücreti:' : 'Ön Muayene Ücreti:'}</span>
+                <span className="text-(--color-primary) text-sm font-mono font-extrabold">
+                  {(sessionStep ? sessionStep.price : Number(selectedDoctor?.initialExamFee)).toLocaleString('tr-TR')} ₺
+                </span>
+              </div>
             </div>
 
-            <Button
-              id="confirm-appointment"
-              fullWidth
-              size="lg"
-              icon={<Check size={16} />}
-              onClick={() => alert('Randevu alındı! 🎉')}
-            >
-              Randevuyu Onayla
-            </Button>
+            <div className="flex items-center gap-3 pt-2">
+              {sessionStep ? (
+                <Link
+                  href="/patient"
+                  className="w-1/3 min-h-[48px] inline-flex items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-primary) text-sm font-semibold"
+                >
+                  Vazgeç
+                </Link>
+              ) : (
+                <Button onClick={() => setStep(2)} variant="outline" size="lg" className="w-1/3 justify-center min-h-[48px] font-semibold">
+                  <ArrowLeft className="w-4 h-4 mr-1.5" /> Geri
+                </Button>
+              )}
+              <Button
+                onClick={handleSubmit}
+                variant="primary"
+                size="lg"
+                className="w-2/3 justify-center min-h-[48px] font-bold shadow-(--shadow-primary-soft)"
+                disabled={isSubmitting || !selectedSlot}
+              >
+                {isSubmitting ? 'Gönderiliyor...' : sessionStep ? 'Seans Talebini Gönder' : 'Randevu Ön Talebini Gönder'}
+              </Button>
+            </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between items-start gap-3">
-      <span className="text-sm text-(--color-text-muted) shrink-0">{label}</span>
-      <span className="text-sm text-(--color-text-primary) text-right">{value}</span>
-    </div>
-  );
+function nextWorkingDays(schedule: WorkingSchedule | null | undefined, count: number): string[] {
+  const result: string[] = [];
+  for (let i = 0; i <= MAX_BOOKING_DAYS_AHEAD && result.length < count; i++) {
+    const d = clinicDateOffset(i);
+    if (isWorkingDay(schedule, d)) result.push(d);
+  }
+  return result;
 }
 
-function nextSlot(slot: string): string {
-  const [h, m] = slot.split(':').map(Number);
-  const totalMin = h * 60 + m + 30;
-  return `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+function formatDateChip(date: string) {
+  const [y, m, d] = date.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d, 12));
+  return {
+    weekday: dt.toLocaleDateString('tr-TR', { weekday: 'short', timeZone: 'UTC' }),
+    day: String(d),
+    month: dt.toLocaleDateString('tr-TR', { month: 'short', timeZone: 'UTC' }),
+  };
 }

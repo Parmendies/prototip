@@ -3,14 +3,14 @@ import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Doktor Paneli',
+  title: 'Doktor Paneli — DentaPanel',
 };
 
 export default function DoctorLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-(--color-bg-base)">
       <DoctorSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden pb-16 md:pb-0">
         {children}
       </div>
     </div>

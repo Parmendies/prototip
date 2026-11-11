@@ -10,45 +10,46 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* --- Color Tokens (Custom) --- */
-  --color-bg-base:       #e9e9e9;
+  /* --- Color Tokens (Dental Clinical System) --- */
+  --color-bg-base:       #eef3f6;
   --color-bg-surface:    #ffffff;
-  --color-bg-elevated:   #f5f5f5;
-  --color-bg-overlay:    #f0f0f0;
+  --color-bg-elevated:   #f6f9fb;
+  --color-bg-overlay:    #eaf2f5;
 
-  --color-border:        #d1d5db;
-  --color-border-subtle: #e9e9e9;
+  --color-border:        #cbd5e1;
+  --color-border-subtle: #e2e8f0;
 
-  --color-primary:       #3278ff;
-  --color-primary-light: #6b9fff;
-  --color-primary-dark:  #1e4cb3;
-  --color-primary-muted: #ebf2ff;
+  --color-primary:       #0f8a9d;
+  --color-primary-light: #38b2c6;
+  --color-primary-dark:  #0b6b7a;
+  --color-primary-muted: #e6f5f8;
 
-  --color-secondary:     #aec7e5;
-  --color-secondary-muted: #ebf1f8;
+  --color-secondary:     #a8d5e5;
+  --color-secondary-muted: #eaf4f8;
 
   --color-accent:        hsl(38 90% 50%);
   --color-accent-muted:  hsl(38 70% 94%);
 
-  --color-success:       hsl(142 60% 40%);
-  --color-success-muted: hsl(142 50% 92%);
+  --color-success:       #059669;
+  --color-success-muted: #d1fae5;
 
-  --color-warning:       hsl(38 92% 50%);
-  --color-warning-muted: hsl(38 70% 92%);
+  --color-warning:       #d97706;
+  --color-warning-muted: #fef3c7;
 
-  --color-error:         hsl(0 75% 55%);
-  --color-error-muted:   hsl(0 60% 94%);
+  --color-error:         #dc2626;
+  --color-error-muted:   #fee2e2;
 
   --color-text-primary:   #172130;
-  --color-text-secondary: #64748b;
-  --color-text-muted:     #b9babd;
+  --color-text-secondary: #475569;
+  --color-text-muted:     #64748b;
 
   /* --- Soft Shadows --- */
   --shadow-sm:  0 1px 2px rgba(23, 33, 48, 0.04);
   --shadow-md:  0 4px 12px rgba(23, 33, 48, 0.06);
-  --shadow-lg:  0 8px 30px rgba(23, 33, 48, 0.08);
-  --shadow-glow-primary: 0 0 20px rgba(50, 120, 255, 0.25);
-  --shadow-glow-secondary: 0 0 20px rgba(174, 199, 229, 0.25);
+  --shadow-lg:  0 10px 30px rgba(15, 138, 157, 0.08);
+  --shadow-primary-soft: 0 4px 14px rgba(15, 138, 157, 0.22);
+  --shadow-glow-primary: 0 0 20px rgba(15, 138, 157, 0.25);
+  --shadow-glow-secondary: 0 0 24px rgba(168, 213, 229, 0.35);
 }
 
 /* =====================================================
@@ -236,3 +237,18 @@ body {
 .status-dot.busy    { background: var(--color-error); }
 .status-dot.away    { background: var(--color-warning); }
 .status-dot.offline { background: var(--color-text-muted); }
+
+/* Touch target accessibility (minimum 44x44px for clickable elements) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Hide scrollbar for clean horizontal tabs/chips while keeping scrollability */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

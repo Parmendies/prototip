@@ -18,30 +18,28 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)] ' +
-    'shadow-[0_0_12px_hsl(172_66%_50%/0.3)] hover:shadow-[0_0_20px_hsl(172_66%_50%/0.5)] font-semibold',
+    'bg-(--color-primary) text-white hover:bg-(--color-primary-dark) ' +
+    'shadow-(--shadow-primary-soft) hover:shadow-md font-semibold cursor-pointer',
   secondary:
-    'bg-[var(--color-secondary)] text-white hover:bg-[hsl(258,60%,68%)] ' +
-    'shadow-[0_0_12px_hsl(258_60%_60%/0.3)] hover:shadow-[0_0_20px_hsl(258_60%_60%/0.5)]',
+    'bg-(--color-primary-muted) text-(--color-primary) hover:bg-(--color-primary)/15 ' +
+    'border border-(--color-primary)/20 font-semibold cursor-pointer',
   outline:
-    'border border-[var(--color-border)] text-[var(--color-text-primary)] ' +
-    'hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] bg-transparent',
+    'border border-(--color-border) text-(--color-text-primary) ' +
+    'hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-elevated) bg-transparent font-medium cursor-pointer',
   ghost:
-    'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] ' +
-    'hover:bg-[var(--color-bg-elevated)] bg-transparent',
+    'text-(--color-text-secondary) hover:text-(--color-text-primary) ' +
+    'hover:bg-(--color-bg-elevated) bg-transparent font-medium cursor-pointer',
   danger:
-    'bg-[var(--color-error)] text-white hover:bg-[hsl(0,84%,68%)] ' +
-    'shadow-[0_0_12px_hsl(0_84%_60%/0.3)]',
+    'bg-(--color-error) text-white hover:bg-red-700 shadow-sm font-semibold cursor-pointer',
   success:
-    'bg-[var(--color-success)] text-white hover:bg-[hsl(142,71%,52%)] ' +
-    'shadow-[0_0_12px_hsl(142_71%_45%/0.3)]',
+    'bg-(--color-success) text-white hover:bg-emerald-700 shadow-sm font-semibold cursor-pointer',
 };
 
 const sizeStyles: Record<Size, string> = {
-  xs: 'px-2.5 py-1 text-xs gap-1',
-  sm: 'px-3 py-1.5 text-sm gap-1.5',
-  md: 'px-4 py-2 text-sm gap-2',
-  lg: 'px-5 py-2.5 text-base gap-2',
+  xs: 'px-2.5 py-1 text-xs gap-1 min-h-[32px]',
+  sm: 'px-3 py-1.5 text-xs font-semibold gap-1.5 min-h-[36px]',
+  md: 'px-4 py-2.5 text-sm gap-2 min-h-[44px]',
+  lg: 'px-5 py-3 text-base gap-2.5 min-h-[48px]',
 };
 
 export function Button({

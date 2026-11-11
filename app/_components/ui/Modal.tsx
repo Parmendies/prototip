@@ -72,30 +72,30 @@ export function Modal({
       >
         {/* Header */}
         {(title || subtitle) && (
-          <div className="flex items-start justify-between gap-4 p-5 border-b border-(--color-border-subtle)">
-            <div>
+          <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-(--color-border-subtle)">
+            <div className="min-w-0">
               {title && (
                 <h2
                   id="modal-title"
-                  className="text-base font-semibold text-(--color-text-primary)"
+                  className="text-base font-bold text-(--color-text-primary) truncate"
                 >
                   {title}
                 </h2>
               )}
               {subtitle && (
-                <p className="text-sm text-(--color-text-muted) mt-0.5">{subtitle}</p>
+                <p className="text-xs text-(--color-text-secondary) mt-0.5 truncate">{subtitle}</p>
               )}
             </div>
             <button
               onClick={onClose}
               className={cn(
-                'shrink-0 p-1.5 rounded-lg transition-colors',
-                'text-(--color-text-muted) hover:text-(--color-text-primary)',
-                'hover:bg-(--color-bg-elevated)'
+                'shrink-0 w-11 h-11 rounded-xl transition-colors inline-flex items-center justify-center cursor-pointer',
+                'text-(--color-text-secondary) hover:text-(--color-text-primary)',
+                'hover:bg-(--color-bg-elevated) active:scale-95'
               )}
               aria-label="Kapat"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           </div>
         )}

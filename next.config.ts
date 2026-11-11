@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // Full-stack SSR & Server Actions mode (Next.js 16)
 };
 
 export default nextConfig;

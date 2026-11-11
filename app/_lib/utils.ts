@@ -76,36 +76,46 @@ export function truncate(str: string, maxLength: number): string {
 // =====================================================
 export function getStatusColor(status: string): string {
   const map: Record<string, string> = {
-    confirmed:  'text-(--color-success) bg-(--color-success-muted)',
-    pending:    'text-(--color-warning) bg-(--color-warning-muted)',
-    in_progress:'text-(--color-primary) bg-(--color-primary-muted)',
-    completed:  'text-(--color-text-secondary) bg-(--color-bg-elevated)',
-    cancelled:  'text-(--color-error) bg-(--color-error-muted)',
-    no_show:    'text-(--color-error) bg-(--color-error-muted)',
-    active:     'text-(--color-success) bg-(--color-success-muted)',
-    inactive:   'text-(--color-text-secondary) bg-(--color-bg-elevated)',
-    available:  'text-(--color-success) bg-(--color-success-muted)',
-    occupied:   'text-(--color-error) bg-(--color-error-muted)',
-    maintenance:'text-(--color-warning) bg-(--color-warning-muted)',
+    pending_approval: 'text-amber-900 bg-amber-100 border border-amber-200',
+    confirmed:        'text-sky-900 bg-sky-100 border border-sky-200',
+    checked_in_unpaid:'text-orange-950 bg-orange-100 border border-orange-300 font-bold',
+    waiting_room:     'text-emerald-900 bg-emerald-100 border border-emerald-200 font-bold',
+    in_chair:         'text-teal-900 bg-teal-100 border border-teal-200 font-bold',
+    awaiting_chairside_payment: 'text-red-950 bg-red-100 border border-red-300 font-bold',
+    pending:          'text-amber-900 bg-amber-100 border border-amber-200',
+    in_progress:      'text-(--color-primary) bg-(--color-primary-muted) border border-(--color-primary)/20',
+    completed:        'text-(--color-text-secondary) bg-(--color-bg-elevated) border border-(--color-border-subtle)',
+    cancelled:        'text-red-900 bg-red-100 border border-red-200',
+    no_show:          'text-red-900 bg-red-100 border border-red-200',
+    active:           'text-emerald-900 bg-emerald-100 border border-emerald-200',
+    inactive:         'text-(--color-text-secondary) bg-(--color-bg-elevated)',
+    available:        'text-emerald-900 bg-emerald-100 border border-emerald-200',
+    occupied:         'text-red-900 bg-red-100 border border-red-200',
+    maintenance:      'text-amber-900 bg-amber-100 border border-amber-200',
   };
-  return map[status] ?? 'text-(--color-text-secondary) bg-(--color-bg-elevated)';
+  return map[status] ?? 'text-(--color-text-secondary) bg-(--color-bg-elevated) border border-(--color-border-subtle)';
 }
 
 export function getStatusLabel(status: string): string {
   const map: Record<string, string> = {
-    confirmed:   'Onaylandı',
-    pending:     'Beklemede',
-    in_progress: 'Devam Ediyor',
-    completed:   'Tamamlandı',
-    cancelled:   'İptal Edildi',
-    no_show:     'Gelmedi',
-    active:      'Aktif',
-    inactive:    'Pasif',
-    available:   'Müsait',
-    occupied:    'Dolu',
-    maintenance: 'Bakımda',
-    face_to_face:'Yüz Yüze',
-    online:      'Online',
+    pending_approval: 'Ön Talep (Teyit Bekliyor)',
+    confirmed:        'Onaylandı (Randevu Günü QR Okutunuz)',
+    checked_in_unpaid:'Giriş Yapıldı (Ödeme Bekleniyor)',
+    waiting_room:     'Ödendi (Bekleme Odasında)',
+    in_chair:         'Muayenede',
+    awaiting_chairside_payment: 'Ek İşlem Ödemesi Bekleniyor',
+    pending:          'Beklemede',
+    in_progress:      'Devam Ediyor',
+    completed:        'Tamamlandı',
+    cancelled:        'İptal Edildi',
+    no_show:          'Gelmedi',
+    active:           'Aktif',
+    inactive:         'Pasif',
+    available:        'Müsait',
+    occupied:         'Dolu',
+    maintenance:      'Bakımda',
+    face_to_face:     'Yüz Yüze',
+    online:           'Online',
   };
   return map[status] ?? status;
 }

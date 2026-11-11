@@ -11,8 +11,8 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 const paddingStyles = {
   none: '',
   sm:   'p-3',
-  md:   'p-5',
-  lg:   'p-6',
+  md:   'p-4 sm:p-5',
+  lg:   'p-5 sm:p-6',
 };
 
 export function Card({
@@ -26,7 +26,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-2xl border',
+        'rounded-2xl border shadow-xs',
         glass
           ? 'glass'
           : 'bg-(--color-bg-surface) border-(--color-border-subtle)',
@@ -52,25 +52,25 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, subtitle, action, icon, className }: CardHeaderProps) {
   return (
-    <div className={cn('flex items-start justify-between gap-3', className)}>
+    <div className={cn('flex items-center justify-between gap-3', className)}>
       <div className="flex items-center gap-3 min-w-0">
         {icon && (
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-(--color-primary-muted) text-(--color-primary)nk-0">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-(--color-primary-muted) text-(--color-primary) shrink-0 shadow-2xs">
             {icon}
           </div>
         )}
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-(--color-text-primary)cate">
+          <h3 className="text-sm font-bold text-(--color-text-primary) truncate">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-xs text-(--color-text-muted) mt-0.5 truncate">
+            <p className="text-xs text-(--color-text-secondary) mt-0.5 truncate">
               {subtitle}
             </p>
           )}
         </div>
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div className="shrink-0 flex items-center">{action}</div>}
     </div>
   );
 }

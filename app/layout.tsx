@@ -14,12 +14,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MediPanel — Hastane Yönetim Sistemi",
-    template: "%s | MediPanel",
+    default: "DentaPanel — Diş Kliniği Yönetim Sistemi",
+    template: "%s | DentaPanel",
   },
   description:
-    "Çok kiracılı akıllı hastane yönetim paneli. Doktor takvimi, hasta randevusu ve hastane operasyonlarını tek platformda yönetin.",
-  keywords: ["hastane yönetimi", "doktor takvimi", "hasta randevusu", "sağlık paneli"],
+    "Randevu ön talebi, QR check-in, banko tahsilatı, FDI diş kaydı ve seans planlaması tek akışta.",
 };
 
 export default function RootLayout({

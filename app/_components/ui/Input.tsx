@@ -39,37 +39,37 @@ export function Input({
       )}
       <div className="relative flex items-center">
         {prefix && (
-          <span className="absolute left-3 text-(--color-text-muted) flex items-center">
+          <span className="absolute left-3.5 text-(--color-text-muted) flex items-center pointer-events-none">
             {prefix}
           </span>
         )}
         <input
           id={inputId}
           className={cn(
-            'w-full rounded-xl border bg-(--color-bg-elevated) px-3.5 py-2.5',
-            'text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted)',
-            'border-(--color-border) transition-all duration-150',
-            'focus:outline-none focus:border-(--color-primary) focus:ring-1 focus:ring-(--color-primary)',
-            'hover:border-(--color-bg-overlay)',
+            'w-full min-h-[44px] rounded-xl border bg-(--color-bg-elevated) px-3.5 py-2.5',
+            'text-sm font-medium text-(--color-text-primary) placeholder:text-(--color-text-muted)',
+            'border-(--color-border-subtle) transition-all duration-150',
+            'focus:outline-none focus:border-(--color-primary) focus:ring-2 focus:ring-(--color-primary)',
+            'hover:border-(--color-border)',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             error && 'border-(--color-error) focus:border-(--color-error) focus:ring-(--color-error)',
-            prefix && 'pl-10',
-            suffix && 'pr-10',
+            prefix && 'pl-11',
+            suffix && 'pr-11',
             className
           )}
           {...props}
         />
         {suffix && (
-          <span className="absolute right-3 text-(--color-text-muted) flex items-center">
+          <span className="absolute right-3.5 text-(--color-text-muted) flex items-center pointer-events-none">
             {suffix}
           </span>
         )}
       </div>
       {error && (
-        <p className="text-xs text-(--color-error)">{error}</p>
+        <p className="text-xs font-medium text-(--color-error) mt-0.5">{error}</p>
       )}
       {hint && !error && (
-        <p className="text-xs text-(--color-text-muted)">{hint}</p>
+        <p className="text-xs text-(--color-text-muted) mt-0.5">{hint}</p>
       )}
     </div>
   );
@@ -90,7 +90,7 @@ export function Textarea({ label, error, hint, className, id, ...props }: Textar
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-(--color-text-secondary)"
+          className="text-xs font-semibold text-(--color-text-secondary)"
         >
           {label}
           {props.required && (
@@ -102,19 +102,19 @@ export function Textarea({ label, error, hint, className, id, ...props }: Textar
         id={inputId}
         className={cn(
           'w-full rounded-xl border bg-(--color-bg-elevated) px-3.5 py-2.5',
-          'text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted)',
-          'border-(--color-border) transition-all duration-150 resize-none',
-          'focus:outline-none focus:border-(--color-primary) focus:ring-1 focus:ring-(--color-primary)',
-          'hover:border-(--color-bg-overlay)',
+          'text-sm font-medium text-(--color-text-primary) placeholder:text-(--color-text-muted)',
+          'border-(--color-border-subtle) transition-all duration-150 resize-none',
+          'focus:outline-none focus:border-(--color-primary) focus:ring-2 focus:ring-(--color-primary)',
+          'hover:border-(--color-border)',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          error && 'border-(--color-error)',
+          error && 'border-(--color-error) focus:border-(--color-error) focus:ring-(--color-error)',
           className
         )}
         rows={props.rows ?? 4}
         {...props}
       />
-      {error && <p className="text-xs text-(--color-error)">{error}</p>}
-      {hint && !error && <p className="text-xs text-(--color-text-muted)">{hint}</p>}
+      {error && <p className="text-xs font-medium text-(--color-error) mt-0.5">{error}</p>}
+      {hint && !error && <p className="text-xs text-(--color-text-muted) mt-0.5">{hint}</p>}
     </div>
   );
 }
