@@ -76,29 +76,18 @@ async function runPatientFlow() {
   await page.waitForTimeout(1000);
   await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '07_patient_book_step1.png') });
 
-  // Select Doctor
-  const doctorCards = await page.$$('button:has-text("Randevu Seç"), div:has-text("Muayene Ücreti")');
-  console.log(`Bulunan hekim kartı sayısı: ${doctorCards.length}`);
-  
-  // Find first select button
-  const selectDoctorBtn = await page.$('button:has-text("Randevu Seç"), button:has-text("Seç")');
-  if (selectDoctorBtn) {
-    await selectDoctorBtn.click();
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '08_patient_book_step2.png') });
+  // Adım 1: Şikayet -> yapay zekâ hekim önerisi (öneri gelmese de akış devam eder)
+  await page.fill('textarea', 'Arka azı dişimde yemek yerken keskin bir sızı hissediyorum.');
+  await page.click('button:has-text("Bana Uygun Hekimi Öner")');
+  await page.waitForSelector('text=2. Hekiminizi Seçin', { timeout: 30000 });
+  const recommended = await page.locator('text=Size Önerilen').count();
+  console.log(recommended ? 'Yapay zekâ hekim önerdi.' : 'Öneri yok: hekim listesi önerisiz gösterildi.');
+  await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '08_patient_book_step2.png') });
 
-    // Step 2: Complaint
-    const textarea = await page.$('textarea');
-    if (textarea) {
-      await textarea.fill('Arka azı dişimde yemek yerken keskin bir sızı hissediyorum.');
-      const continueBtn = await page.$('button:has-text("Tarih ve Saat Seçimine İlerle")');
-      if (continueBtn) {
-        await continueBtn.click();
-        await page.waitForTimeout(600);
-        await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '09_patient_book_step3.png') });
-      }
-    }
-  }
+  // Adım 2: Hekim (önerilen ya da ilk hekim seçili gelir) -> Adım 3: Tarih & saat
+  await page.click('button:has-text("Tarih & Saat Seç")');
+  await page.waitForSelector('text=Randevu Özeti');
+  await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '09_patient_book_step3.png') });
 
   // 7. Check-in Page with Active Session
   console.log('7. Doğrudan Kamera QR Check-in Ekranı Test Ediliyor...');

@@ -7,6 +7,7 @@ import { computeEndTime, getDoctorDaySlots, getDoctorScheduleInfo, validateBooka
 import { requirePatient } from '@/lib/auth/dal';
 import { sendPatientNotification } from '@/lib/notifications';
 import { broadcastChange } from '@/lib/realtime';
+import { triageComplaint, type TriageResult } from '@/lib/ai/triage';
 
 export async function getActiveDoctors() {
   const doctors = await db
@@ -24,6 +25,32 @@ export async function getActiveDoctors() {
     .where(eq(staffUsers.isActive, true));
 
   return doctors;
+}
+
+// Hasta başına yapay zekâ önerisi sınırı (süreç belleğinde; kötüye kullanım/maliyet freni)
+const TRIAGE_WINDOW_MS = 10 * 60 * 1000;
+const TRIAGE_MAX_PER_WINDOW = 8;
+const triageCalls = new Map<string, number[]>();
+
+/**
+ * Şikayet metnine göre hekim önerir. Öneri üretilemezse (kota, model hatası,
+ * çok kısa metin) null döner; istemci hekim listesini önerisiz gösterir.
+ */
+export async function recommendDoctorForComplaint(complaint: string): Promise<TriageResult | null> {
+  const patient = await requirePatient();
+  if (typeof complaint !== 'string' || complaint.trim().length < 5) return null;
+
+  const now = Date.now();
+  const recent = (triageCalls.get(patient.patientId) ?? []).filter((t) => now - t < TRIAGE_WINDOW_MS);
+  if (recent.length >= TRIAGE_MAX_PER_WINDOW) return null;
+  recent.push(now);
+  triageCalls.set(patient.patientId, recent);
+
+  const doctors = await getActiveDoctors();
+  return triageComplaint(
+    complaint,
+    doctors.map((d) => ({ id: d.id, title: d.title, fullName: d.fullName, branch: d.branch }))
+  );
 }
 
 /** Hastanın aynı gün için en az kaç dakika sonrasına talep bırakabileceği */

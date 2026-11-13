@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # 1. Install dependencies
 FROM base AS deps
@@ -13,6 +13,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
+# Next.js derleme sırasında sayfa veri toplaması (collect page data) için dummy build-time değerleri
+ENV SESSION_SECRET=build-time-secret-placeholder-for-compilation-only
+ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
+ENV KIOSK_HMAC_SECRET=build-time-hmac-placeholder-for-compilation-only
+
 RUN npm run build
 
 # 3. Production Runner

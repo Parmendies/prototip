@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { clinicDateOffset } from '@/lib/time';
 import { isWorkingDay, MAX_BOOKING_DAYS_AHEAD, type Slot, type WorkingSchedule } from '@/lib/slots';
-import { getActiveDoctors, createAppointmentPreRequest, getAvailableSlots, getStepBookingInfo } from './actions';
+import { getActiveDoctors, createAppointmentPreRequest, getAvailableSlots, getStepBookingInfo, recommendDoctorForComplaint } from './actions';
+import type { TriageResult } from '@/lib/ai/triage';
 import { Card } from '@/app/_components/ui/Card';
 import { Button } from '@/app/_components/ui/Button';
 import {
@@ -12,6 +13,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -44,6 +46,9 @@ export default function BookAppointmentPage() {
   const [slotsWorkingDay, setSlotsWorkingDay] = useState(true);
   // Tedavi planındaki bir seans için talep (/patient/book?step=<id>)
   const [sessionStep, setSessionStep] = useState<Awaited<ReturnType<typeof getStepBookingInfo>>>(null);
+  // Yapay zekâ hekim önerisi: hangi şikayet metni için üretildiğiyle birlikte tutulur
+  const [triage, setTriage] = useState<{ complaint: string; result: TriageResult | null } | null>(null);
+  const [isTriaging, setIsTriaging] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -118,6 +123,40 @@ export default function BookAppointmentPage() {
       cancelled = true;
     };
   }, [step, selectedDoctorId, selectedDate, sessionStep]);
+
+  const complaintText = complaint.trim();
+  const canTriage = complaintText.length >= 5;
+  // Öneri yalnızca üretildiği şikayet metni değişmediyse geçerlidir
+  const triageIsCurrent = triage !== null && triage.complaint === complaintText;
+  const activeRecommendation = triageIsCurrent ? triage.result : null;
+  const triageUnavailable = triageIsCurrent && triage.result === null;
+  const recommendedDoctor = activeRecommendation?.doctorId
+    ? doctors.find((d) => d.id === activeRecommendation.doctorId)
+    : undefined;
+  const orderedDoctors = recommendedDoctor
+    ? [recommendedDoctor, ...doctors.filter((d) => d.id !== recommendedDoctor.id)]
+    : doctors;
+
+  async function handleComplaintContinue() {
+    setError(null);
+    if (!canTriage || triageIsCurrent) {
+      setStep(2);
+      return;
+    }
+    setIsTriaging(true);
+    let result: TriageResult | null = null;
+    try {
+      result = await recommendDoctorForComplaint(complaintText);
+    } catch {
+      result = null; // öneri alınamazsa akış önerisiz devam eder
+    }
+    setTriage({ complaint: complaintText, result });
+    if (result?.doctorId && doctors.some((d) => d.id === result.doctorId)) {
+      setSelectedDoctorId(result.doctorId);
+    }
+    setIsTriaging(false);
+    setStep(2);
+  }
 
   async function handleSubmit() {
     if (!selectedDoctorId || !selectedDate || !selectedSlot) {
@@ -233,21 +272,145 @@ export default function BookAppointmentPage() {
           </div>
         )}
 
-        {/* STEP 1: HEKİM SEÇİMİ */}
+        {/* STEP 1: ŞİKAYET GİRİŞİ */}
         {step === 1 && (
           <div className="space-y-4">
             <div>
               <h2 className="text-lg font-bold text-(--color-text-primary)">
-                1. Muayene Olmak İstediğiniz Hekimi Seçin
+                1. Şikayetinizi Anlatın
+              </h2>
+              <p className="text-xs text-(--color-text-secondary) mt-0.5">
+                Yazdıklarınıza göre size en uygun bölümü ve hekimi önerelim. Hangi hekime gideceğinizi bilmenize gerek yok.
+              </p>
+            </div>
+
+            {/* Quick tags */}
+            <div>
+              <label className="block text-xs font-bold text-(--color-text-secondary) mb-2">
+                Hızlı Seçim Etiketleri
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {QUICK_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    disabled={isTriaging}
+                    onClick={() => {
+                      if (complaint.includes(tag)) return;
+                      setComplaint((prev) => (prev ? `${prev}, ${tag}` : tag));
+                    }}
+                    className="min-h-[38px] text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-white border border-(--color-border-subtle) hover:border-(--color-primary) hover:text-(--color-primary) transition-all text-(--color-text-secondary) cursor-pointer active:scale-95 shadow-2xs"
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="complaint" className="block text-xs font-bold text-(--color-text-secondary) mb-1.5">
+                Şikayet Detayı
+              </label>
+              <textarea
+                id="complaint"
+                rows={4}
+                maxLength={1000}
+                value={complaint}
+                disabled={isTriaging}
+                onChange={(e) => setComplaint(e.target.value)}
+                placeholder="Örn: Sol alt azı dişimde 2 gündür soğuk su içerken şiddetli sızlama oluyor..."
+                className="w-full p-3.5 rounded-xl bg-white border border-(--color-border-subtle) text-sm font-medium text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:ring-2 focus:ring-(--color-primary) focus:outline-none resize-none disabled:opacity-60"
+              />
+              <p className="text-[11px] text-(--color-text-muted) mt-1.5 leading-relaxed">
+                Öneri için yalnızca bu metin yapay zekâya iletilir; adınız ve telefon numaranız paylaşılmaz. Lütfen metne kimlik bilgisi yazmayınız.
+              </p>
+            </div>
+
+            <Button
+              onClick={handleComplaintContinue}
+              variant="primary"
+              size="lg"
+              className="w-full justify-center min-h-[48px] text-sm font-bold shadow-(--shadow-primary-soft)"
+              loading={isTriaging}
+              icon={canTriage ? <Sparkles className="w-4 h-4" /> : undefined}
+              iconRight={canTriage ? undefined : <ArrowRight className="w-4 h-4" />}
+            >
+              {isTriaging
+                ? 'Size uygun hekim belirleniyor...'
+                : canTriage
+                  ? 'Bana Uygun Hekimi Öner'
+                  : 'Devam Et: Hekim Seçimi'}
+            </Button>
+            {canTriage && !isTriaging && (
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                className="w-full min-h-[44px] text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-primary) cursor-pointer"
+              >
+                Hekimimi kendim seçmek istiyorum
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* STEP 2: HEKİM SEÇİMİ (yapay zekâ önerisiyle) */}
+        {step === 2 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-bold text-(--color-text-primary)">
+                2. Hekiminizi Seçin
               </h2>
               <p className="text-xs text-(--color-text-secondary) mt-0.5">
                 Ön muayene ücreti hekimin uzmanlığına göre değişmekte olup bankoda tahsil edilir.
               </p>
             </div>
 
+            {activeRecommendation?.urgency === 'urgent' && (
+              <div role="alert" className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">
+                  <p className="font-bold">Şikayetiniz acil olabilir.</p>
+                  <p>
+                    Randevu onayını beklemeden kliniğimizi telefonla arayınız. Nefes alma veya yutma güçlüğü, durmayan kanama varsa 112&apos;yi arayınız.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeRecommendation ? (
+              <div className="p-4 rounded-2xl bg-(--color-primary-muted)/50 border border-(--color-primary)/30">
+                <div className="flex items-center gap-2 text-(--color-primary)">
+                  <Sparkles className="w-4 h-4 shrink-0" />
+                  <span className="text-xs font-bold">
+                    {recommendedDoctor
+                      ? `Önerilen bölüm: ${activeRecommendation.department || recommendedDoctor.branch}`
+                      : 'Şikayetiniz hakkında'}
+                  </span>
+                </div>
+                <p className="text-sm text-(--color-text-primary) mt-1.5 leading-relaxed">
+                  {activeRecommendation.reason}
+                </p>
+                {activeRecommendation.urgency === 'soon' && (
+                  <p className="text-xs font-semibold text-amber-800 mt-1.5">
+                    En yakın uygun randevu saatini seçmenizi öneririz.
+                  </p>
+                )}
+                <p className="text-[11px] text-(--color-text-secondary) mt-2 leading-relaxed">
+                  Bu bir yönlendirme önerisidir, teşhis değildir. Dilerseniz başka bir hekim seçebilirsiniz.
+                </p>
+              </div>
+            ) : (
+              triageUnavailable && (
+                <div className="p-3 rounded-xl bg-white border border-dashed border-(--color-border-subtle) text-xs text-(--color-text-secondary)">
+                  Şu an otomatik öneri sunamıyoruz. Hekiminizi aşağıdaki listeden seçebilirsiniz; emin değilseniz sekreterimiz sizi doğru hekime yönlendirecektir.
+                </div>
+              )
+            )}
+
             <div className="grid grid-cols-1 gap-3">
-              {doctors.map((doc) => {
+              {orderedDoctors.map((doc) => {
                 const isSelected = selectedDoctorId === doc.id;
+                const isRecommended = recommendedDoctor?.id === doc.id;
                 return (
                   <button
                     type="button"
@@ -260,6 +423,11 @@ export default function BookAppointmentPage() {
                         : 'bg-white border-(--color-border-subtle) hover:border-(--color-border)'
                     }`}
                   >
+                    {isRecommended && (
+                      <span className="inline-flex items-center gap-1 mb-2 px-2 py-0.5 rounded-full bg-(--color-primary) text-white text-[11px] font-bold">
+                        <Sparkles className="w-3 h-3" /> Size Önerilen
+                      </span>
+                    )}
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shrink-0 ${
@@ -271,7 +439,7 @@ export default function BookAppointmentPage() {
                           <h3 className="text-sm font-bold text-(--color-text-primary) truncate">
                             {doc.title} {doc.fullName}
                           </h3>
-                          <p className="text-xs text-(--color-text-secondary) mt-0.5 truncate font-medium">
+                          <p className="text-xs text-(--color-text-secondary) mt-0.5 font-medium">
                             {doc.branch}
                           </p>
                         </div>
@@ -289,71 +457,19 @@ export default function BookAppointmentPage() {
               })}
             </div>
 
-            <Button
-              onClick={() => setStep(2)}
-              variant="primary"
-              size="lg"
-              className="w-full justify-center min-h-[48px] text-sm font-bold shadow-(--shadow-primary-soft) mt-4"
-              disabled={!selectedDoctorId}
-            >
-              Devam Et: Şikayet & Detaylar <ArrowRight className="w-4 h-4 ml-1.5" />
-            </Button>
-          </div>
-        )}
-
-        {/* STEP 2: ŞİKAYET GİRİŞİ */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-(--color-text-primary)">
-                2. Şikayetinizi veya İşlem Talebinizi Belirtin
-              </h2>
-              <p className="text-xs text-(--color-text-secondary) mt-0.5">
-                Hekiminizin önceden hazırlanabilmesi için kısaca açıklayınız.
-              </p>
-            </div>
-
-            {/* Quick tags */}
-            <div>
-              <label className="block text-xs font-bold text-(--color-text-secondary) mb-2">
-                Hızlı Seçim Etiketleri
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {QUICK_TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => {
-                      if (complaint.includes(tag)) return;
-                      setComplaint((prev) => (prev ? `${prev}, ${tag}` : tag));
-                    }}
-                    className="min-h-[38px] text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-white border border-(--color-border-subtle) hover:border-(--color-primary) hover:text-(--color-primary) transition-all text-(--color-text-secondary) cursor-pointer active:scale-95 shadow-2xs"
-                  >
-                    + {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-(--color-text-secondary) mb-1.5">
-                Şikayet Detayı
-              </label>
-              <textarea
-                rows={4}
-                value={complaint}
-                onChange={(e) => setComplaint(e.target.value)}
-                placeholder="Örn: Sol alt azı dişimde 2 gündür soğuk su içerken şiddetli sızlama oluyor..."
-                className="w-full p-3.5 rounded-xl bg-white border border-(--color-border-subtle) text-sm font-medium text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:ring-2 focus:ring-(--color-primary) focus:outline-none resize-none"
-              />
-            </div>
-
             <div className="flex items-center gap-3 pt-2">
-              <Button onClick={() => setStep(1)} variant="outline" size="lg" className="w-1/3 justify-center min-h-[48px] font-semibold">
-                <ArrowLeft className="w-4 h-4 mr-1.5" /> Geri
+              <Button onClick={() => setStep(1)} variant="outline" size="lg" icon={<ArrowLeft className="w-4 h-4" />} className="w-1/3 justify-center min-h-[48px] text-sm font-semibold">
+                Geri
               </Button>
-              <Button onClick={() => setStep(3)} variant="primary" size="lg" className="w-2/3 justify-center min-h-[48px] font-bold shadow-(--shadow-primary-soft)">
-                Devam Et: Tarih & Saat <ArrowRight className="w-4 h-4 ml-1.5" />
+              <Button
+                onClick={() => setStep(3)}
+                variant="primary"
+                size="lg"
+                iconRight={<ArrowRight className="w-4 h-4" />}
+                className="w-2/3 justify-center min-h-[48px] text-sm font-bold shadow-(--shadow-primary-soft)"
+                disabled={!selectedDoctorId}
+              >
+                Tarih & Saat Seç
               </Button>
             </div>
           </div>
@@ -501,8 +617,8 @@ export default function BookAppointmentPage() {
                   Vazgeç
                 </Link>
               ) : (
-                <Button onClick={() => setStep(2)} variant="outline" size="lg" className="w-1/3 justify-center min-h-[48px] font-semibold">
-                  <ArrowLeft className="w-4 h-4 mr-1.5" /> Geri
+                <Button onClick={() => setStep(2)} variant="outline" size="lg" icon={<ArrowLeft className="w-4 h-4" />} className="w-1/3 justify-center min-h-[48px] text-sm font-semibold">
+                  Geri
                 </Button>
               )}
               <Button
