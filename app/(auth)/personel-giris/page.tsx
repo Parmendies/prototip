@@ -149,13 +149,20 @@ export default function StaffLoginPage() {
           )}
         </Card>
 
-        {/* Back to patient portal */}
-        <div className="mt-6 text-center">
+        {/* Back to patient portal & Standalone demo link */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
           <a
             href="/giris"
-            className="inline-flex items-center justify-center min-h-[44px] text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-primary) transition-colors"
+            className="inline-flex items-center justify-center min-h-[44px] text-(--color-text-secondary) hover:text-(--color-primary) transition-colors"
           >
-            &larr; Hasta Giriş Sayfasına Dön
+            &larr; Hasta Girişi
+          </a>
+          <span className="text-slate-300">•</span>
+          <a
+            href="/demo"
+            className="inline-flex items-center justify-center min-h-[44px] text-(--color-primary) hover:underline transition-colors"
+          >
+            🦷 Bağımsız Diş Haritası Demosu &rarr;
           </a>
         </div>
       </div>

@@ -361,6 +361,15 @@ export default function PatientLoginPage() {
         <p className="mt-6 text-center text-xs text-(--color-text-secondary) leading-relaxed">
           PIN&apos;inizi mi unuttunuz? Klinik bankosu tek tıkla sıfırlayabilir.
         </p>
+
+        <div className="mt-4 text-center">
+          <a
+            href="/demo"
+            className="inline-flex items-center justify-center min-h-[44px] text-xs font-semibold text-(--color-primary) hover:underline transition-colors"
+          >
+            🦷 Diş Haritası & Tedavi Planı Bağımsız Demosunu Gör &rarr;
+          </a>
+        </div>
       </div>
     </div>
   );
